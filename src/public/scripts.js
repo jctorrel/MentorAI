@@ -1,5 +1,5 @@
 // Configuration minimale côté client
-const DEFAULT_EMAIL = "etudiant.test@example.com";
+const DEFAULT_EMAIL = "etudiant.test@normandiewebschool.fr";
 const PROGRAM_ID = "A1";
 
 // Récupère l'email via ?email=... si présent, sinon valeur par défaut
