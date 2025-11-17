@@ -4,7 +4,7 @@ import { getDb } from "./client";
 export async function getStudentSummary(email: string) {
   const db = getDb();
   const doc = await db.collection("student_summaries").findOne({ email });
-  return doc?.summary || "";
+  return doc?.summary || " - il n'y a pas encore de résumé - ";
 }
 
 export async function upsertStudentSummary(email: string, summary: string) {

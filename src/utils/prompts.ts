@@ -7,7 +7,7 @@ import { logger } from "./logger";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export default function loadPrompt(name: string) {
+export function loadPrompt(name: string) {
   const filePath = path.join(__dirname, "..", "..", "config", "prompts", name);
   try {
     logger.info(`✅ Fichier de prompts chargé : ${name}`);
@@ -19,7 +19,7 @@ export default function loadPrompt(name: string) {
 }
 
 // Template engine: {{ var }}
-function render(template: string, vars: []) {
+export function render(template: string, vars: []) {
   return template.replace(/{{\s*(\w+)\s*}}/g, (_, key) => {
     return Object.prototype.hasOwnProperty.call(vars, key) &&
       vars[key] !== undefined &&
