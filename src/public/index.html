@@ -1,24 +1,61 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Hello World</title>
-    <style>
-      body { font-family: system-ui, Arial, sans-serif; margin: 2rem; }
-      code { background: #f3f3f3; padding: .2rem .4rem; border-radius: .25rem; }
-    </style>
-  </head>
-  <body>
-    <h1>Hello World 👋</h1>
-    <p>Page statique servie depuis <code>src/public/</code>.</p>
-    <p>Ping API: <span id="ping">…</span></p>
-    <script>
-      fetch("/api/health").then(r => r.json()).then(d => {
-        document.getElementById("ping").textContent = d.time;
-      }).catch(() => {
-        document.getElementById("ping").textContent = "API indisponible";
-      });
-    </script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Mentor NWS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Markdown renderer -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="app">
+    <header class="app-header">
+      <img data-lazyloaded="1" src="https://normandiewebschool.fr/wp-content/uploads/2023/10/Logo-NWS.svg"
+        data-src="https://normandiewebschool.fr/wp-content/uploads/2023/10/Logo-NWS.svg" alt="Logo NWS" title="Logo NWS"
+        data-ll-status="loaded" class="entered litespeed-loaded">
+      <div class="app-title">
+        <h1>Mentor AI</h1>
+        <span>Accompagnement individuel</span>
+      </div>
+      <div class="badge-pill">
+        <span class="label">
+          <div class="status-wrapper">
+            <span id="status-dot" class="status-dot status-offline"></span>
+            <span id="status-label" class="status-label">Hors ligne</span>
+          </div>
+        </span>
+      </div>
+    </header>
+
+    <div class="chat-wrapper">
+      <div class="helper-bar">
+        <div>
+          Connecté en tant que
+          <span class="email-label" id="student-email-label"></span>
+        </div>
+        <div>Le mentor s'appuie sur ton historique et les ressources de la NWS.</div>
+      </div>
+
+      <div id="chat" class="chat"></div>
+
+      <div class="input-zone">
+        <form id="form" class="input-bar">
+          <input id="input" type="text" placeholder="Pose ta question : organisation, cours, alternance, révisions..."
+            autocomplete="off" required />
+          <button type="submit" id="send-btn">
+            <span class="icon">➜</span>
+            <span>Envoyer</span>
+          </button>
+        </form>
+        <div id="error" class="error-banner" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="scripts.js"></script>
+</body>
+
 </html>
