@@ -3,6 +3,10 @@ import express from "express";
 import { saveMessage } from "../db/messages";
 import { logger } from "../utils/logger";
 
+import getEnv from "../utils/env";
+const log = getEnv("LOG_MESSAGES") !== "false";
+
+
 export default function createChatRouter() {
     const router = express.Router();
 
@@ -17,7 +21,9 @@ export default function createChatRouter() {
         }
 
         // Log message utilisateur
-        await saveMessage(email, "user", message);
+        if (log !== false) {
+            await saveMessage(email, "user", message);
+        }
     });
 
     return router;
