@@ -2,7 +2,12 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 
-import createApiRouter from "./routes"
+import { initMongo } from "./db";
+import createApiRouter from "./routes";
+import getEnv from "./utils/env";
+
+
+const mongoUri = getEnv("MONGODB_URI");
 
 export function buildApp() {
   const app = express();
@@ -14,6 +19,9 @@ export function buildApp() {
   // Static
   const publicDir = path.join(process.cwd(), "src", "public");
   app.use(express.static(publicDir));
+
+  // DB
+  initMongo(mongoUri);
 
   // Routes
   app.use(createApiRouter());

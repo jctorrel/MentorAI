@@ -1,16 +1,14 @@
 import { createServer } from "http";
-import { initMongo, getDb, closeMongo } from "./src/db";
+import { closeMongo } from "./src/db";
 import { buildApp } from "./src/app";
-import { getEnv } from "./src/utils/env";
 import { logger } from "./src/utils/logger";
-import express from "express";
+
+import getEnv from "./src/utils/env";
 
 const port = Number(getEnv("PORT", "4000"));
-const mongoUri = getEnv("MONGODB_URI");
 
 // Start
 const app = buildApp();
-initMongo(mongoUri);
 
 process.on("SIGINT", () => shutdown("SIGINT"));
 process.on("SIGTERM", () => shutdown("SIGTERM"));

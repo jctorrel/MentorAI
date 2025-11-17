@@ -1,6 +1,6 @@
 import "dotenv/config";
 
-export function getEnv(key: string, fallback?: string): string {
+export default function getEnv(key: string, fallback?: string): string {
   const val = process.env[key];
   if (val === undefined || val === "") {
     if (fallback !== undefined) return fallback;
