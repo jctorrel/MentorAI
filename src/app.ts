@@ -1,15 +1,18 @@
 import express from "express";
 import cors from "cors";
 import path from "path";
+import OpenAI from "openai";
 
-import { initMongo } from "./db/client.js";
-import createApiRouter from "./routes/index.js";
+import { initMongo } from "./db/client";
+import createApiRouter from "./routes/index";
 import getEnv from "./utils/env.js";
-import loadPrompt from "./utils/prompts.js";
-import loadConfig from "./utils/configs.js";
+import loadPrompt from "./utils/prompts";
+import loadConfig from "./utils/configs";
 
 
 const mongoUri = getEnv("MONGODB_URI");
+// OpenAI client
+export const openai = new OpenAI({ apiKey: getEnv("OPENAI_API_KEY") });
 
 export default function buildApp() {
   const app = express();
@@ -31,8 +34,6 @@ export default function buildApp() {
   // Configs
   const mentorConfig = loadConfig("mentor-config.json");
   const programs = loadConfig("programs.json");
-
-  console.log(programs);
 
   // Prompts
   const mentorSystemTemplate = loadPrompt("mentor-system.txt");

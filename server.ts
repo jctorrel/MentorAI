@@ -1,9 +1,9 @@
 import { createServer } from "http";
 
-import buildApp from "./src/app.js";
-import { logger } from "./src/utils/logger.js";
-import getEnv from "./src/utils/env.js";
-import { shutdown } from "./src/utils/shutdown.js";
+import buildApp from "./src/app";
+import { logger } from "./src/utils/logger";
+import getEnv from "./src/utils/env";
+import { shutdown } from "./src/utils/shutdown";
 
 const port = Number(getEnv("PORT", "4000"));
 

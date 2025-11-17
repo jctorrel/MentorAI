@@ -1,6 +1,6 @@
 // src/db/index.ts
 import { Db, MongoClient } from "mongodb";
-import { logger } from "../utils/logger.js";
+import { logger } from "../utils/logger";
 
 let client: MongoClient | undefined;
 let db: Db | undefined;
@@ -21,7 +21,7 @@ export async function initMongo(uri: string, dbName: string = "") {
     db.collection("students").createIndex({ email: 1 }, { unique: true }),
   ]);
 
-  console.log("✅ Mongo connecté");
+  logger.info("✅ Mongo connecté");
   return { client, db };
 }
 

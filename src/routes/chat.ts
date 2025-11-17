@@ -1,8 +1,8 @@
 // routes/health.js
 import express from "express";
-import { saveMessage } from "../db/messages.js";
-import { getStudentSummary } from "../db/summaries.js";
-import { logger } from "../utils/logger.js";
+import { saveMessage } from "../db/messages";
+import { getStudentSummary } from "../db/summaries";
+import { logger } from "../utils/logger";
 
 import getEnv from "../utils/env";
 const log = getEnv("LOG_MESSAGES") !== "false";

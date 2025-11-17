@@ -1,7 +1,7 @@
 
 import express from "express";
-import createHealthRouter from "./health.js";
-import createChatRouter from "./chat.js";
+import createHealthRouter from "./health";
+import createChatRouter from "./chat";
 
 export default function createApiRouter() {
     const router = express.Router();

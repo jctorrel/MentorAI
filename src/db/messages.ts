@@ -1,5 +1,5 @@
 // src/db/messages.ts
-import { getDb } from "./client.js";
+import { getDb } from "./client";
 
 export async function saveMessage(email :string, role:string, content:string) {
   const db = getDb();

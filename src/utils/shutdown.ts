@@ -1,6 +1,6 @@
 // ./src/utils/shutdown.ts
-import { logger } from "./logger.js";
-import { closeMongo } from "../db/client.js";
+import { logger } from "./logger";
+import { closeMongo } from "../db/client";
 
 export const shutdown = async (sig: string, server : any) => {
     logger.warn(`Reçu ${sig}, arrêt en cours...`);

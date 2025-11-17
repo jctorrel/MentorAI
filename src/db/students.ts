@@ -1,5 +1,5 @@
 // src/db/students.ts
-import { getDb } from "./client.js";
+import { getDb } from "./client";
 
 export async function upsertStudent(email: string, data = {}) {
   const db = getDb();
