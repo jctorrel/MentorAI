@@ -17,7 +17,7 @@ export default function createChatRouter(args: any) {
     const router = express.Router();
 
     router.post("/chat", async (_req, res) => {
-        const { email, message, programId } = _req.body;
+        const { email, message, programID } = _req.body;
 
         if (!email || !message) {
             logger.error("Message reçu mais le format ne correspond pas");
@@ -36,7 +36,7 @@ export default function createChatRouter(args: any) {
         const lastUserMessage = await getLastMessages(email);
         const summary = render(args.summarySystemTemplate, { "last_user_message": lastUserMessage, "previous_summary": previousSummary });
 
-        const systemPrompt = getSystemPrompt(args, email, programId, summary);
+        const systemPrompt = getSystemPrompt(args, email, programID, summary);
 
         // OpenAI
         const reply = await openai.responses.create({
@@ -50,13 +50,13 @@ export default function createChatRouter(args: any) {
     return router;
 }
 
-function getSystemPrompt(args: any, email: string, programId: string, summary: string) {
+function getSystemPrompt(args: any, email: string, programID: string, summary: string) {
     return render(args.mentorSystemTemplate, {
         "email": email,
         "school_name": args.mentorConfig.school_name,
         "tone": args.mentorConfig.tone,
         "rules": args.mentorConfig.rules,
         "summary": summary || "- Aucun historique significatif pour l'instant.",
-        "program_context": args.programs[programId]
+        "program_context": args.programs[programID]
     });
 }
