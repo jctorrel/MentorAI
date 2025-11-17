@@ -1,22 +1,11 @@
+
 import express from "express";
-import cors from "cors";
-import path from "path";
+import createHealthRouter from "./health";
 
-export function buildApp() {
-  const app = express();
+export default function createApiRouter() {
+    const router = express.Router();
 
-  // Middlewares
-  app.use(cors());
-  app.use(express.json());
+    router.use("/api", createHealthRouter());
 
-  // Static
-  const publicDir = path.join(process.cwd(), "src", "public");
-  app.use(express.static(publicDir));
-
-  // Routes API minimales
-  app.get("/api/health", (_req, res) => {
-    res.json({ ok: true, time: new Date().toISOString() });
-  });
-
-  return app;
+    return router;
 }
