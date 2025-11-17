@@ -1,7 +1,8 @@
 // routes/health.js
 import express from "express";
-import { saveMessage } from "../db/messages";
-import { logger } from "../utils/logger";
+import { saveMessage } from "../db/messages.js";
+import { getStudentSummary } from "../db/summaries.js";
+import { logger } from "../utils/logger.js";
 
 import getEnv from "../utils/env";
 const log = getEnv("LOG_MESSAGES") !== "false";
@@ -24,6 +25,7 @@ export default function createChatRouter() {
         if (log !== false) {
             await saveMessage(email, "user", message);
         }
+        const summary = await getStudentSummary(email);
     });
 
     return router;

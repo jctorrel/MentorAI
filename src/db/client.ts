@@ -1,6 +1,6 @@
 // src/db/index.ts
 import { Db, MongoClient } from "mongodb";
-import { logger } from "../utils/logger";
+import { logger } from "../utils/logger.js";
 
 let client: MongoClient | undefined;
 let db: Db | undefined;

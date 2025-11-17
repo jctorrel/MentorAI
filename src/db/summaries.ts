@@ -1,5 +1,5 @@
 // src/db/summaries.ts
-import { getDb } from ".";
+import { getDb } from "./client.js";
 
 export async function getStudentSummary(email: string) {
   const db = getDb();

@@ -2,14 +2,15 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 
-import { initMongo } from "./db";
-import createApiRouter from "./routes";
-import getEnv from "./utils/env";
+import { initMongo } from "./db/client.js";
+import createApiRouter from "./routes/index.js";
+import getEnv from "./utils/env.js";
+import loadPrompt from "./utils/prompts.js";
 
 
 const mongoUri = getEnv("MONGODB_URI");
 
-export function buildApp() {
+export default function buildApp() {
   const app = express();
 
   // Middlewares
@@ -25,6 +26,9 @@ export function buildApp() {
 
   // Routes
   app.use(createApiRouter());
+
+  // Prompts
+  loadPrompt("mentor-system.txt");
 
   return app;
 }

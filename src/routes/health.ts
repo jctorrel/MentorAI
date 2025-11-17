@@ -1,6 +1,6 @@
 // routes/health.js
 import express from "express";
-import { logger } from "../utils/logger";
+import { logger } from "../utils/logger.js";
 
 export default function createHealthRouter() {
     const router = express.Router();
