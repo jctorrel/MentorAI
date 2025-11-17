@@ -1,15 +1,12 @@
 // routes/health.js
 import express from "express";
 
-import { saveMessage } from "../db/messages";
-import { getStudentSummary } from "../db/summaries";
-import { getLastMessages } from "../db/messages";
+import { getStudentSummary, createStudentSummary } from "../db/summaries";
 import { logger } from "../utils/logger";
 import { render } from "../utils/prompts";
 import getEnv from "../utils/env";
 import { openai } from "../app";
 
-const log = getEnv("LOG_MESSAGES") !== "false";
 const MENTOR_MODEL = getEnv("MENTOR_MODEL");
 
 
@@ -17,34 +14,47 @@ export default function createChatRouter(args: any) {
     const router = express.Router();
 
     router.post("/chat", async (_req, res) => {
-        const { email, message, programID } = _req.body;
+        try {
+            const { email, message, programID } = _req.body;
 
-        if (!email || !message) {
-            logger.error("Message reçu mais le format ne correspond pas");
-            return res
-                .status(400)
-                .json({ reply: "email et message sont requis." });
+            if (!email || !message || !programID) {
+                return res
+                    .status(400)
+                    .json({ reply: "email, message et programID sont requis." });
+            }
+
+            // Construction du prompt
+            const previousSummary = await getStudentSummary(email);
+            const systemPrompt = getSystemPrompt(args, email, programID, previousSummary);
+
+            // OpenAI
+            const reply = await openai.responses.create({
+                model: MENTOR_MODEL,
+                instructions: systemPrompt,
+                input: message
+            });
+            const mentorReply = reply.output_text.trim();
+
+            // Réponse du mentor
+            res.json({ mentorReply });
+
+            // Création du résumé
+            await createStudentSummary(args.summarySystemTemplate, email, message, mentorReply);
+        } catch (err) {
+            logger.error("❌ Erreur /api/chat :", err);
+
+            if (err.status === 429 || err.code === "insufficient_quota") {
+                return res.status(503).json({
+                    reply:
+                        "Le mentor est temporairement indisponible (limite d'utilisation technique atteinte). Réessaie plus tard ou signale-le à l'équipe."
+                });
+            }
+
+            return res.status(500).json({
+                reply:
+                    "Je rencontre un problème technique. Réessaie dans un moment ou signale-le à l'équipe."
+            });
         }
-
-        // Log message utilisateur
-        if (log !== false) {
-            await saveMessage(email, "user", message);
-        }
-
-        // Construction du prompt
-        const previousSummary = await getStudentSummary(email);
-        const lastUserMessage = await getLastMessages(email);
-        const summary = render(args.summarySystemTemplate, { "last_user_message": lastUserMessage, "previous_summary": previousSummary });
-
-        const systemPrompt = getSystemPrompt(args, email, programID, summary);
-
-        // OpenAI
-        const reply = await openai.responses.create({
-            model: MENTOR_MODEL,
-            instructions: systemPrompt,
-            input: message
-        });
-        const assistantReply = reply.output_text.trim();
     });
 
     return router;
@@ -57,6 +67,6 @@ function getSystemPrompt(args: any, email: string, programID: string, summary: s
         "tone": args.mentorConfig.tone,
         "rules": args.mentorConfig.rules,
         "summary": summary || "- Aucun historique significatif pour l'instant.",
-        "program_context": args.programs[programID]
+        "program_context": JSON.stringify(args.programs[programID])
     });
 }

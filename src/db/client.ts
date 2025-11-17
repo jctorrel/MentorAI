@@ -14,15 +14,9 @@ export async function initMongo(uri: string, dbName: string = "") {
   await client.connect();
   db = dbName ? client.db(dbName) : client.db();
 
-  // Indexes minimaux (idempotents)
-  await Promise.all([
-    db.collection("messages").createIndex({ email: 1, createdAt: -1 }),
-    db.collection("student_summaries").createIndex({ email: 1 }, { unique: true }),
-    db.collection("students").createIndex({ email: 1 }, { unique: true }),
-  ]);
+  await db.collection("student_summaries").createIndex({ email: 1 }, { unique: true });
 
   logger.info("✅ Mongo connecté");
-  return { client, db };
 }
 
 export function getDb() {

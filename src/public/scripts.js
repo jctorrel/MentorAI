@@ -129,28 +129,10 @@ async function sendMessage(message) {
     let data = null;
     try {
       data = await resp.json();
+      addMentorMessageMarkdown(data.mentorReply);
     } catch (e) {
-      // ignore parse error, handled below
+      console.log(e);
     }
-
-    if (!resp.ok) {
-      const safeMsg =
-        (data && data.reply) ||
-        "Une erreur technique est survenue. Signale-le à l'équipe si cela persiste.";
-      addMentorMessageMarkdown(safeMsg);
-      showError(`Erreur ${resp.status} côté serveur.`);
-      return;
-    }
-
-    const reply = (data && (data.reply || data.message)) || "Réponse vide.";
-    addMentorMessageMarkdown(reply);
-  } catch (err) {
-    console.error("Erreur front /api/chat :", err);
-    hideTyping();
-    addMentorMessageMarkdown(
-      "Je n'arrive pas à joindre le serveur du mentor. Vérifie ta connexion ou signale le problème."
-    );
-    showError("Impossible de contacter le serveur (`/api/chat`).");
   } finally {
     statusLabelEl.textContent = "Prêt";
     sendBtnEl.disabled = false;

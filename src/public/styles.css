@@ -28,13 +28,12 @@ body {
     background:
         radial-gradient(circle at top left, #ffffff 0, #eef2ff 36%, #e0f7ff 100%);
     color: var(--text-main);
-    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: stretch;
 }
 
-img {
+.logo {
     max-width: 120px;
     height: auto;
 }
@@ -50,6 +49,8 @@ img {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    max-height: 100%;
+    overflow-y: scroll;
 }
 
 .app-header {
@@ -200,7 +201,7 @@ img {
 
 .msg .label {
     display: block;
-    font-size: 9px;
+    font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.14em;
     color: var(--nws-purple);
@@ -208,28 +209,9 @@ img {
 }
 
 /* Markdown styling dans les messages mentor */
-.msg.mentor h1,
-.msg.mentor h2,
-.msg.mentor h3 {
-    font-size: 13px;
-    margin: 4px 0 2px;
-    font-weight: 600;
-    color: var(--nws-purple);
-}
-
-.msg.mentor ul,
-.msg.mentor ol {
-    padding-left: 16px;
-    margin: 2px 0;
-}
-
-.msg.mentor li {
-    margin: 1px 0;
-}
-
 .msg.mentor code {
     font-family: monospace;
-    font-size: 11px;
+    font-size: 9px;
     padding: 1px 4px;
     border-radius: 4px;
     background: #111827;
