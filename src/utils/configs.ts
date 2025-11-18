@@ -1,18 +1,17 @@
 // src/utils/prompts.ts
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
 import { logger } from "./logger";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Use project root as base directory to remain compatible with tests (ts-jest)
+const PROJECT_ROOT = process.cwd();
 
-export default function loadConfig(name: string) {
-    let config = {};
+export default function loadConfig(name: string): any {
+    let config: any = {};
 
     try {
         const raw = fs.readFileSync(
-            path.join(__dirname, "..", "..", "config", name),
+            path.join(PROJECT_ROOT, "config", name),
             "utf8"
         );
         const parsed = JSON.parse(raw);
