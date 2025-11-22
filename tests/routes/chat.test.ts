@@ -31,7 +31,7 @@ app.use(express.json());
 
 const deps = {
   openai: fakeOpenAI,
-  mentorSystemTemplate: "TEMPLATE",
+  mentorSystemTemplate: "MENTOR_TEMPLATE",
   summarySystemTemplate: "SUMMARY_TEMPLATE",
   mentorConfig: {
     school_name: "Test School",
@@ -39,9 +39,9 @@ const deps = {
     rules: "Règles",
   },
   programs: {
-    "program-1": { id: "A1", name: "Programme A1" },
+    "program-1": { id: "program-1", name: "Programme 1" },
   },
-  mentorModel: "gpt-4.1-mini",
+  mentorModel: "osef-model",
 };
 
 app.use("/api", createChatRouter(deps));

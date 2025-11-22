@@ -11,6 +11,10 @@ jobs:
     name: Quick check (push to dev)
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
+    env:
+      NODE_ENV: test
+      MENTOR_MODEL: gpt-5-mini
+      SUMMARY_MODEL: gpt-5-nano
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -31,6 +35,10 @@ jobs:
     name: Full check (PR → main)
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
+    env:
+      NODE_ENV: test
+      MENTOR_MODEL: gpt-5-mini
+      SUMMARY_MODEL: gpt-5-nano
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
