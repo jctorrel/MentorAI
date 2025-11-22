@@ -1,0 +1,26 @@
+import express from 'express';
+import request from 'supertest';
+
+import createHealthRouter from '../../src/routes/health';
+
+const fakeOpenAI = {
+  models: {
+    list: jest.fn().mockResolvedValue({ data: [] }),
+  },
+} as any;
+
+const app = express();
+app.use('/api', createHealthRouter(fakeOpenAI));
+
+describe('GET /health', () => {
+  it('devrait répondre 200 avec le statut ok', async () => {
+    const res = await request(app)
+      .get('/api/health')
+      .expect('Content-Type', /json/)
+      .expect(200);
+
+    expect(res.body.ok).toBe(true);
+    expect(typeof res.body.time).toBe('string');
+    expect(() => new Date(res.body.time).toISOString()).not.toThrow();
+  });
+});

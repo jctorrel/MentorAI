@@ -5,7 +5,7 @@ import OpenAI from "openai";
 
 import { initMongo } from "./db/client";
 import createApiRouter from "./routes/index";
-import getEnv from "./utils/env.js";
+import getEnv from "./utils/env";
 import { loadPrompt } from "./utils/prompts";
 import loadConfig from "./utils/configs";
 
@@ -38,7 +38,13 @@ export default function buildApp() {
 
   
   // Routes
-  app.use(createApiRouter({"mentorSystemTemplate" : mentorSystemTemplate, "summarySystemTemplate" : summarySystemTemplate, "mentorConfig" : mentorConfig, "programs" : programs}));
+  app.use(createApiRouter({
+    openai,
+    mentorSystemTemplate,
+    summarySystemTemplate,
+    mentorConfig,
+    programs
+  }));
 
   return app;
 }

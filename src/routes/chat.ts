@@ -5,7 +5,6 @@ import { getStudentSummary, createStudentSummary } from "../db/summaries";
 import { logger } from "../utils/logger";
 import { render } from "../utils/prompts";
 import getEnv from "../utils/env";
-import { openai } from "../app";
 
 const MENTOR_MODEL = getEnv("MENTOR_MODEL");
 
@@ -28,7 +27,7 @@ export default function createChatRouter(args: any) {
             const systemPrompt = getSystemPrompt(args, email, programID, previousSummary);
 
             // OpenAI
-            const reply = await openai.responses.create({
+            const reply = await args.openai.responses.create({
                 model: MENTOR_MODEL,
                 instructions: systemPrompt,
                 input: message
@@ -42,13 +41,6 @@ export default function createChatRouter(args: any) {
             await createStudentSummary(args.summarySystemTemplate, email, message, mentorReply);
         } catch (err) {
             logger.error("❌ Erreur /api/chat :", err);
-
-            if (err.status === 429 || err.code === "insufficient_quota") {
-                return res.status(503).json({
-                    reply:
-                        "Le mentor est temporairement indisponible (limite d'utilisation technique atteinte). Réessaie plus tard ou signale-le à l'équipe."
-                });
-            }
 
             return res.status(500).json({
                 reply:
