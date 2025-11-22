@@ -3,7 +3,6 @@ import fs from "fs";
 import path from "path";
 import { logger } from "./logger";
 
-// Use project root as base directory to remain compatible with tests (ts-jest)
 const PROJECT_ROOT = process.cwd();
 
 export default function loadConfig(name: string): any {

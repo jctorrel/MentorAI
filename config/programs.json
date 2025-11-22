@@ -1,13 +1,54 @@
 {
   "A1": {
-    "Objectif": "Découvrir les métiers du numérique, acquérir les bases du web et un socle de compétences utiles",
-    "Niveau attendu" : "Première année post-bac",
+    "label": "Année 1 - Développeur des métiers du numérique",
+    "object": "bases du web et métiers du numérique",
+    "level" : "première année post-bac",
     "modules": [
-      "Wordpress : installation, configuration et déploiement",
-      "Création graphique : Adobe Photoshop, Adobe Illustrato et Adobe Indesign",
-      "UX : Figma",
-      "Photos / Vidéos : base de la prise de vue réelle et de la retouche (lightRoom)",
-      "Marketing : SEO / SMO"
+      {
+        "id": "wordpress",
+        "label": "Wordpress",
+        "start_month": 9,
+        "end_month": 10,
+        "content": [
+          "installation, configuration et déploiement"
+        ]
+      },
+      {
+        "id": "creation-graphique",
+        "label": "Création graphique",
+        "start_month": 9,
+        "end_month": 11,
+        "content": [
+          "Photoshop, Illustrator, Indesign"
+        ]
+      },
+      {
+        "id": "photos-videos",
+        "label": "Photos / Vidéos",
+        "start_month": 10,
+        "end_month": 12,
+        "content": [
+          "base de la prise de vue réelle et de la retouche (lightRoom)"
+        ]
+      },
+      {
+        "id": "marketing-digital",
+        "label": "Marketing digital",
+        "start_month": 12,
+        "end_month": 2,
+        "content": [
+          "SEO / SMO"
+        ]
+      },
+      {
+        "id": "projet-annee",
+        "label": "Projet d'année",
+        "start_month": 9,
+        "end_month": 8,
+        "content": [
+          "protfolio en ligne, sous wordpress. Intégration des différents projets réalisés durant l'année."
+        ]
+      }
     ]
   }
 }

@@ -4,6 +4,7 @@ import express from "express";
 import { getStudentSummary, createStudentSummary } from "../db/summaries";
 import { logger } from "../utils/logger";
 import { render } from "../utils/prompts";
+import getProgramPrompt from "../utils/programs";
 import getEnv from "../utils/env";
 
 const MENTOR_MODEL = getEnv("MENTOR_MODEL");
@@ -53,12 +54,14 @@ export default function createChatRouter(args: any) {
 }
 
 function getSystemPrompt(args: any, email: string, programID: string, summary: string) {
-    return render(args.mentorSystemTemplate, {
+    const program_context = getProgramPrompt(args.programs, programID);
+
+    console.log(render(args.mentorSystemTemplate, {
         "email": email,
         "school_name": args.mentorConfig.school_name,
         "tone": args.mentorConfig.tone,
         "rules": args.mentorConfig.rules,
         "summary": summary || "- Aucun historique significatif pour l'instant.",
-        "program_context": JSON.stringify(args.programs[programID])
-    });
+        "program": program_context
+    }));
 }
