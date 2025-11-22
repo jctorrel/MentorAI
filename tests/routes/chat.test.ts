@@ -3,20 +3,24 @@ import express from "express";
 import request from "supertest";
 
 import createChatRouter from "../../src/routes/chat";
+import { getStudentSummary, createStudentSummary } from "../../src/db/summaries";
+import { render } from "../../src/utils/prompts";
 
-// on mock la DB
+
+// Mock  DB
 jest.mock("../../src/db/summaries", () => ({
   getStudentSummary: jest.fn().mockResolvedValue(null),
   createStudentSummary: jest.fn().mockResolvedValue(undefined),
 }));
 
-// on mock le render
-jest.mock("../../src/utils/prompts", () => ({
-  render: jest.fn((_tpl, ctx) => `SYSTEM PROMPT FOR ${ctx.email}`),
-}));
-
-import { getStudentSummary, createStudentSummary } from "../../src/db/summaries";
-import { render } from "../../src/utils/prompts";
+// Mock render
+jest.mock("../../src/utils/prompts", () => {
+  const actual = jest.requireActual("../../src/utils/prompts");
+  return {
+    ...actual,
+    render: jest.fn((_tpl, ctx) => `SYSTEM PROMPT FOR ${ctx.email}`),
+  };
+});
 
 const fakeOpenAI = {
   responses: {
@@ -39,7 +43,19 @@ const deps = {
     rules: "Règles",
   },
   programs: {
-    "program-1": { id: "program-1", name: "Programme 1" },
+    "A1": {
+      object: "Découvrir les métiers du numérique...",
+      level: "Première année post-bac",
+      modules: [
+        {
+          id: "creation-graphique",
+          label: "Création graphique",
+          start_month: 1,
+          end_month: 12,
+          content: ["Création graphique : Photoshop, Illustrator, Indesign"],
+        },
+      ],
+    },
   },
   mentorModel: "osef-model",
 };
@@ -55,7 +71,7 @@ describe("POST /api/chat", () => {
     const payload = {
       email: "eleve@test.com",
       message: "Bonjour le mentor",
-      programID: "program-1",
+      programID: "A1",
     };
 
     const res = await request(app)

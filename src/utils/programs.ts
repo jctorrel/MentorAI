@@ -1,4 +1,5 @@
 // src/utils/programs.ts
+import { logger } from "./logger";
 import { loadPrompt, render } from "./prompts";
 
 type ProgramModule = {
@@ -20,8 +21,9 @@ type Programs = Record<string, Program>;
 
 function getActiveModules(programs: Programs, programID: string, date: Date = new Date()): ProgramModule[] {
     const program = programs[programID];
-    if (!program) {
-        throw new Error(`Programme inconnu : ${programID}`);
+    if (!program || !Array.isArray(program.modules)) {
+        logger.error(`❌ Programme introuvable ou invalide pour l'ID : ${programID}`);
+        return [];
     }
 
     const currentMonth = date.getMonth() + 1; // JS: 0 = janvier → +1

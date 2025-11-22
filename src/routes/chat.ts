@@ -56,12 +56,12 @@ export default function createChatRouter(args: any) {
 function getSystemPrompt(args: any, email: string, programID: string, summary: string) {
     const program_context = getProgramPrompt(args.programs, programID);
 
-    console.log(render(args.mentorSystemTemplate, {
+    return render(args.mentorSystemTemplate, {
         "email": email,
         "school_name": args.mentorConfig.school_name,
         "tone": args.mentorConfig.tone,
         "rules": args.mentorConfig.rules,
         "summary": summary || "- Aucun historique significatif pour l'instant.",
         "program": program_context
-    }));
+    });
 }
