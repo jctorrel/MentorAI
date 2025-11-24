@@ -46,3 +46,12 @@ describe('POST /init', () => {
         expect(res.body.modules).toStrictEqual(getActiveModules(fakePrograms, fakeProgramID));
     });
 });
+
+it("devrait répondre 400 si programID est manquant", async () => {
+    const res = await request(app)
+        .post('/api/init')
+        .send({})
+        .expect(400);
+
+    expect(res.body.reply).toBe("programID est requis.");
+});
