@@ -8,6 +8,14 @@ import InputBar from "./components/InputBar.jsx";
 
 const DEFAULT_EMAIL = "etudiant.test@normandiewebschool.fr";
 const PROGRAM_ID = "A1";
+const INIT_MESSAGE = "Bonjour 👋\nJe suis ton mentor pédagogique numérique. Voici les modules disponibles pour cette session, sur quoi souhaites-tu travailler ?\n";
+const DEFAULT_MESSAGES = [
+  {
+    id: 1,
+    sender: "mentor",
+    content: "Bonjour 👋\nJe suis ton mentor pédagogique numérique. Sur quoi souhaites-tu travailler aujourd'hui ?\n"
+  }
+];
 
 function getStudentEmail() {
   const params = new URLSearchParams(window.location.search);
@@ -16,16 +24,7 @@ function getStudentEmail() {
 
 function MentorChatApp() {
   const [studentEmail] = useState(getStudentEmail);
-  const [messages, setMessages] = useState(() => [
-    {
-      id: 1,
-      sender: "mentor",
-      content:
-        "Bonjour 👋\n\nJe suis ton mentor pédagogique numérique. " +
-        "Explique-moi ta situation, tes difficultés ou tes objectifs, " +
-        "et je t'aide à t'organiser dans le cadre de ton école."
-    }
-  ]);
+  const [messages, setMessages] = useState(() => DEFAULT_MESSAGES);
   const [isTyping, setIsTyping] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -33,6 +32,7 @@ function MentorChatApp() {
   const [backendStatusLabel, setBackendStatusLabel] = useState("Hors ligne");
   const [inputValue, setInputValue] = useState("");
 
+  // Health check
   useEffect(() => {
     let isMounted = true;
 
@@ -66,7 +66,7 @@ function MentorChatApp() {
 
     const handleOffline = () => {
       setBackendOnline(false);
-      setBackendStatusLabel("Hors ligne (pas de connexion réseau)");
+      setBackendStatusLabel("Hors ligne");
     };
 
     window.addEventListener("online", handleOnline);
@@ -76,6 +76,61 @@ function MentorChatApp() {
       isMounted = false;
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
+  // Initial conversation
+  useEffect(() => {
+    let isMounted = true;
+
+    async function fetchInitialConversation() {
+      try {
+        const requestOptions = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ programID: PROGRAM_ID })
+        };
+
+        const data = await fetch('api/init', requestOptions)
+          .then(response => response.json());
+
+        if (!data.modules || !Array.isArray(data.modules)) {
+          console.warn("Format inattendu de /api/init");
+          return;
+        }
+
+        // On construit les messages à partir des modules reçus
+        const bulletList = data.modules
+          .map(module => {
+            const label = module.label || "Module sans nom";
+            const content = (module.content || []).join(", ");
+
+            return `• **${label}**\n   – ${content}`;
+          })
+          .join("\n\n"); // séparation entre les modules
+
+        const finalMessage = `${INIT_MESSAGE}\n${bulletList}`;
+
+        if (!isMounted) return;
+
+        // Si l'API renvoie bien au moins un message, on remplace ceux par défaut
+        setMessages([
+          {
+            id: 1,
+            sender: "mentor",
+            content: finalMessage
+          }
+        ]);
+      } catch (err) {
+        console.error("Erreur lors de l'appel à /api/init", err);
+        // On ne change pas messages → on garde DEFAULT_MESSAGES
+      }
+    }
+
+    fetchInitialConversation();
+
+    return () => {
+      isMounted = false;
     };
   }, []);
 

@@ -21,10 +21,6 @@ export default function buildApp(): express.Express {
   app.use(cors());
   app.use(express.json());
 
-  // Static
-  const publicDir = path.join(process.cwd(), "src", "public");
-  app.use(express.static(publicDir));
-
   // DB
   initMongo(mongoUri);
 
