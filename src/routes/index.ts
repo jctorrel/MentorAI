@@ -7,6 +7,7 @@ export default function createApiRouter(args: any) {
     const router = express.Router();
 
     router.use("/api", createHealthRouter(args.openai));
+    router.use("/api", createInitRouter());
     router.use("/api", createChatRouter(args));
 
     return router;
