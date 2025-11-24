@@ -2,7 +2,7 @@
 import { logger } from "./logger";
 import { loadPrompt, render } from "./prompts";
 
-type ProgramModule = {
+export type ProgramModule = {
     id: string;
     label: string;
     start_month: number;
@@ -10,17 +10,17 @@ type ProgramModule = {
     content: string[];
 };
 
-type Program = {
-    object: string;
+export type Program = {
+    objectives: string;
     level: string;
     label: string;
     modules: ProgramModule[];
 };
 
-type Programs = Record<string, Program>;
+export type Programs = Record<string, Program>;
 
-function getActiveModules(programs: Programs, programID: string, date: Date = new Date()): ProgramModule[] {
-    const program = programs[programID];
+export function getActiveModules(programs: Programs, programID: string, date: Date = new Date()): ProgramModule[] {
+    const program: Program = programs[programID];
     if (!program || !Array.isArray(program.modules)) {
         logger.error(`❌ Programme introuvable ou invalide pour l'ID : ${programID}`);
         return [];
@@ -43,13 +43,13 @@ function getActiveModules(programs: Programs, programID: string, date: Date = ne
     });
 }
 
-export default function getProgramPrompt(programs: Programs, programID: string, date: Date = new Date()) {
-    const programPromptTemplate = loadPrompt("program.txt");
-    const modules = getActiveModules(programs, programID, date);
+export function getProgramPrompt(programs: Programs, programID: string, date: Date = new Date()) {
+    const programPromptTemplate: string = loadPrompt("program.txt");
+    const modules: ProgramModule[] = getActiveModules(programs, programID, date);
 
     return render(programPromptTemplate, {
         "program_label": programs[programID].label,
-        "program_objective": programs[programID].object,
+        "program_objective": programs[programID].objectives,
         "program_level": programs[programID].level,
         "program_modules": modules.map((module) => `- ${module.label} : ${module.content.join(", ")}`).join("\n")
     });

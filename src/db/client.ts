@@ -5,7 +5,7 @@ import { logger } from "../utils/logger";
 let client: MongoClient | undefined;
 let db: Db | undefined;
 
-export async function initMongo(uri: string, dbName: string = "") {
+export async function initMongo(uri: string, dbName: string = ""): Promise<{ client: MongoClient; db: Db }> {
   if (db) return { client, db };
 
   if (!uri) throw new Error("MONGODB_URI manquant");
@@ -17,9 +17,11 @@ export async function initMongo(uri: string, dbName: string = "") {
   await db.collection("student_summaries").createIndex({ email: 1 }, { unique: true });
 
   logger.info("✅ Mongo connecté");
+
+  return { client, db };
 }
 
-export function getDb() {
+export function getDb(): Db {
   if (!db) throw new Error("Mongo non initialisé. Appellez initMongo() d'abord.");
   return db;
 }

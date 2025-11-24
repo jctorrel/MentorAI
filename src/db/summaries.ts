@@ -6,13 +6,13 @@ import { openai } from "../app";
 
 const SUMMARY_MODEL = getEnv("SUMMARY_MODEL");
 
-export async function getStudentSummary(email: string) {
+export async function getStudentSummary(email: string): Promise<string> {
   const db = getDb();
   const doc = await db.collection("student_summaries").findOne({ email });
   return doc?.summary || "- Aucun historique significatif pour l'instant -";
 }
 
-export async function createStudentSummary(template: string, email: string, lastUserMessage: string, lastMentorReply: string) {
+export async function createStudentSummary(template: string, email: string, lastUserMessage: string, lastMentorReply: string): Promise<void> {
   const previous = await getStudentSummary(email);
 
   const systemPrompt = render(template, {
@@ -34,7 +34,7 @@ export async function createStudentSummary(template: string, email: string, last
   }
 }
 
-async function upsertStudentSummary(email: string, summary: string) {
+async function upsertStudentSummary(email: string, summary: string): Promise<void> {
   const db = getDb();
   await db.collection("student_summaries").updateOne(
     { email },

@@ -14,7 +14,7 @@ const mongoUri = getEnv("MONGODB_URI");
 // OpenAI client
 export const openai = new OpenAI({ apiKey: getEnv("OPENAI_API_KEY") });
 
-export default function buildApp() {
+export default function buildApp(): express.Express {
   const app = express();
 
   // Middlewares

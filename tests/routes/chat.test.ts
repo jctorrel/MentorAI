@@ -1,4 +1,4 @@
-// __tests__/chat.route.test.ts
+// tests/routes/chat.test.ts
 import express from "express";
 import request from "supertest";
 
@@ -44,16 +44,23 @@ const deps = {
   },
   programs: {
     "A1": {
-      object: "Découvrir les métiers du numérique...",
-      level: "Première année post-bac",
+      object: "Objectif du programme A1",
+      level: "Niveau du programme A1",
       modules: [
         {
-          id: "creation-graphique",
-          label: "Création graphique",
+          id: "module-1",
+          label: "Module 1",
           start_month: 1,
           end_month: 12,
-          content: ["Création graphique : Photoshop, Illustrator, Indesign"],
+          content: ["Sujet M1-1", "Sujet M1-2"],
         },
+        {
+          id: "module-2",
+          label: "Module 2",
+          start_month: 12,
+          end_month: 8,
+          content: ["Sujet M2-1", "Sujet M2-2"],
+        }
       ],
     },
   },

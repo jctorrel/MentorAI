@@ -1,7 +1,7 @@
 {
   "A1": {
     "label": "Année 1 - Développeur des métiers du numérique",
-    "object": "bases du web et métiers du numérique",
+    "objectives": "bases du web et métiers du numérique",
     "level" : "première année post-bac",
     "modules": [
       {

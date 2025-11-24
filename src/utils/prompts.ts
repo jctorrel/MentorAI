@@ -6,7 +6,7 @@ import { logger } from "./logger";
 // Use project root as base directory to remain compatible with tests (ts-jest)
 const PROJECT_ROOT = process.cwd();
 
-export function loadPrompt(name: string) {
+export function loadPrompt(name: string): string {
   const filePath = path.join(PROJECT_ROOT, "config", "prompts", name);
   try {
     logger.info(`✅ Fichier de prompts chargé : ${name}`);
@@ -18,7 +18,7 @@ export function loadPrompt(name: string) {
 }
 
 // Template engine: {{ var }}
-export function render(template: string, vars: Record<string, unknown>) {
+export function render(template: string, vars: Record<string, unknown>): string {
   return template.replace(/{{\s*(\w+)\s*}}/g, (_, key) => {
     const value = (vars as any)[key];
     return value !== undefined && value !== null ? String(value) : "";

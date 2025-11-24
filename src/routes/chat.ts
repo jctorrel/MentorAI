@@ -4,13 +4,12 @@ import express from "express";
 import { getStudentSummary, createStudentSummary } from "../db/summaries";
 import { logger } from "../utils/logger";
 import { render } from "../utils/prompts";
-import getProgramPrompt from "../utils/programs";
+import { getProgramPrompt } from "../utils/programs";
 import getEnv from "../utils/env";
 
 const MENTOR_MODEL = getEnv("MENTOR_MODEL");
 
-
-export default function createChatRouter(args: any) {
+export default function createChatRouter(args: any): express.Router {
     const router = express.Router();
 
     router.post("/chat", async (_req, res) => {
@@ -24,8 +23,8 @@ export default function createChatRouter(args: any) {
             }
 
             // Construction du prompt
-            const previousSummary = await getStudentSummary(email);
-            const systemPrompt = getSystemPrompt(args, email, programID, previousSummary);
+            const previousSummary: string = await getStudentSummary(email);
+            const systemPrompt: string = getSystemPrompt(args, email, programID, previousSummary);
 
             // OpenAI
             const reply = await args.openai.responses.create({
@@ -33,7 +32,7 @@ export default function createChatRouter(args: any) {
                 instructions: systemPrompt,
                 input: message
             });
-            const mentorReply = reply.output_text.trim();
+            const mentorReply: string = reply.output_text.trim();
 
             // Réponse du mentor
             res.json({ mentorReply });
@@ -53,8 +52,8 @@ export default function createChatRouter(args: any) {
     return router;
 }
 
-function getSystemPrompt(args: any, email: string, programID: string, summary: string) {
-    const program_context = getProgramPrompt(args.programs, programID);
+function getSystemPrompt(args: any, email: string, programID: string, summary: string): string {
+    const program_context: string = getProgramPrompt(args.programs, programID);
 
     return render(args.mentorSystemTemplate, {
         "email": email,

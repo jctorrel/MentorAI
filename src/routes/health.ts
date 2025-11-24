@@ -3,7 +3,7 @@ import express from "express";
 import { logger } from "../utils/logger";
 import type OpenAI from "openai";
 
-export default function createHealthRouter(openai: OpenAI) {
+export default function createHealthRouter(openai: OpenAI): express.Router {
     const router = express.Router();
 
     router.get("/health", async (_req, res) => {
