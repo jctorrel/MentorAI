@@ -3,8 +3,12 @@
   "version": "1.0.0",
   "main": "dist/server.js",
   "type": "module",
+  "workspaces": [
+    "client"
+  ],
   "scripts": {
     "dev": "tsx server.ts",
+    "dev:client": "npm --workspace client run dev",
     "start": "node dist/server.js",
     "build": "tsc",
     "test": "jest --coverage",

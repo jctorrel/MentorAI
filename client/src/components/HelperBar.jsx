@@ -8,7 +8,7 @@ function HelperBar({ studentEmail }) {
         <span className="email-label">{studentEmail}</span>
       </div>
       <div>
-        Le mentor peut commettre des erreurs. Il est recommandé de vérifier les
+        Le mentor peut commettre des erreurs. <br /> Il est recommandé de vérifier les
         informations importantes ou de demander à l&apos;équipe de la NWS.
       </div>
     </div>

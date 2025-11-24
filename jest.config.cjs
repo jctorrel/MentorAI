@@ -12,5 +12,6 @@ module.exports = {
   },
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   extensionsToTreatAsEsm: ['.ts'],
-  testMatch: ['**/?(*.)+(spec|test).[tj]s?(x)']
+  testMatch: ['**/?(*.)+(spec|test).[tj]s?(x)'],
+  roots: ["<rootDir>/tests"]
 };

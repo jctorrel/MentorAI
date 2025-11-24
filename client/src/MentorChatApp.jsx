@@ -6,6 +6,7 @@ import Header from "./components/Header.jsx";
 import HelperBar from "./components/HelperBar.jsx";
 import ChatWindow from "./components/ChatWindow.jsx";
 import InputBar from "./components/InputBar.jsx";
+import QuickActions from "./components/QuickActions.jsx";
 
 const DEFAULT_EMAIL = "etudiant.test@normandiewebschool.fr";
 const PROGRAM_ID = "A1";
@@ -80,6 +81,7 @@ function MentorChatApp() {
   const [backendOnline, setBackendOnline] = useState(false);
   const [backendStatusLabel, setBackendStatusLabel] = useState("Hors ligne");
   const [inputValue, setInputValue] = useState("");
+  const [modules, setModules] = useState([]);
 
   // Health check
   useEffect(() => {
@@ -154,6 +156,7 @@ function MentorChatApp() {
 
         if (!isMounted) return;
 
+        setModules(data.modules);
         const finalMessage = buildInitMessage(data.modules);
 
         setMessages([
@@ -240,12 +243,23 @@ function MentorChatApp() {
     }
   }
 
+  function handleModuleClick(module) {
+    const text = `Je veux travailler sur le module "${module.label}"`;
+
+    addUserMessage(text);
+    // On masque les actions rapides après sélection
+    setModules([]);
+    sendMessageToBackend(text);
+  }
+
   function handleSubmit(event) {
     event.preventDefault();
     const text = inputValue.trim();
     if (!text || isLoading) return;
 
     addUserMessage(text);
+    // On masque les actions rapides après sélection
+    setModules([]);
     setInputValue("");
     sendMessageToBackend(text);
   }
@@ -263,6 +277,10 @@ function MentorChatApp() {
         <ChatWindow messages={messages} isTyping={isTyping} />
 
         <div className="input-zone">
+          <QuickActions
+            modules={modules}
+            onModuleClick={handleModuleClick}
+          />
           <InputBar
             value={inputValue}
             onChange={setInputValue}
