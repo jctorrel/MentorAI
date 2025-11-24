@@ -1,3 +1,4 @@
+// client/src/MentorChatApp.jsx
 import React, { useEffect, useState } from "react";
 import "./styles.css";
 
@@ -8,14 +9,62 @@ import InputBar from "./components/InputBar.jsx";
 
 const DEFAULT_EMAIL = "etudiant.test@normandiewebschool.fr";
 const PROGRAM_ID = "A1";
-const INIT_MESSAGE = "Bonjour 👋\nJe suis ton mentor pédagogique numérique. Voici les modules disponibles pour cette session, sur quoi souhaites-tu travailler ?\n";
+
+const INIT_MESSAGE =
+  "Bonjour 👋\n" +
+  "Je suis ton mentor pédagogique numérique. Voici les modules disponibles pour cette session, " +
+  "sur quoi souhaites-tu travailler ?\n";
+
 const DEFAULT_MESSAGES = [
   {
     id: 1,
     sender: "mentor",
-    content: "Bonjour 👋\nJe suis ton mentor pédagogique numérique. Sur quoi souhaites-tu travailler aujourd'hui ?\n"
+    content:
+      "Bonjour 👋\n" +
+      "Je suis ton mentor pédagogique numérique. " +
+      "Sur quoi souhaites-tu travailler aujourd'hui ?\n"
   }
 ];
+
+// Les noms de mois en français
+const MONTHS = [
+  "", // index 0 (inutile)
+  "janvier",
+  "février",
+  "mars",
+  "avril",
+  "mai",
+  "juin",
+  "juillet",
+  "août",
+  "septembre",
+  "octobre",
+  "novembre",
+  "décembre"
+];
+
+/**
+ * Construit le message initial à partir de la liste de modules.
+ * Fonction "pure" → facile à tester.
+ */
+export function buildInitMessage(modules) {
+  if (!Array.isArray(modules) || modules.length === 0) {
+    return DEFAULT_MESSAGES[0].content;
+  }
+
+  const bulletList = modules
+    .map((module) => {
+      const label = module.label || "Module sans nom";
+      const content = (module.content || []).join(", ");
+
+      const monthName = MONTHS[module.end_month] || "une date inconnue";
+
+      return `• **${label}** (_À faire avant fin ${monthName}_) \n ${content}`;
+    })
+    .join("\n\n");
+
+  return `${INIT_MESSAGE}\n\n${bulletList}`;
+}
 
 function getStudentEmail() {
   const params = new URLSearchParams(window.location.search);
@@ -86,34 +135,27 @@ function MentorChatApp() {
     async function fetchInitialConversation() {
       try {
         const requestOptions = {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ programID: PROGRAM_ID })
         };
 
-        const data = await fetch('api/init', requestOptions)
-          .then(response => response.json());
+        const res = await fetch("/api/init", requestOptions);
+        if (!res.ok) {
+          throw new Error("Réponse non OK de /api/init");
+        }
+
+        const data = await res.json();
 
         if (!data.modules || !Array.isArray(data.modules)) {
           console.warn("Format inattendu de /api/init");
           return;
         }
 
-        // On construit les messages à partir des modules reçus
-        const bulletList = data.modules
-          .map(module => {
-            const label = module.label || "Module sans nom";
-            const content = (module.content || []).join(", ");
-
-            return `• **${label}**\n   – ${content}`;
-          })
-          .join("\n\n"); // séparation entre les modules
-
-        const finalMessage = `${INIT_MESSAGE}\n${bulletList}`;
-
         if (!isMounted) return;
 
-        // Si l'API renvoie bien au moins un message, on remplace ceux par défaut
+        const finalMessage = buildInitMessage(data.modules);
+
         setMessages([
           {
             id: 1,
@@ -123,7 +165,7 @@ function MentorChatApp() {
         ]);
       } catch (err) {
         console.error("Erreur lors de l'appel à /api/init", err);
-        // On ne change pas messages → on garde DEFAULT_MESSAGES
+        // On garde DEFAULT_MESSAGES si ça plante
       }
     }
 
@@ -135,7 +177,7 @@ function MentorChatApp() {
   }, []);
 
   function addUserMessage(text) {
-    setMessages(prev => [
+    setMessages((prev) => [
       ...prev,
       {
         id: prev.length + 1,
@@ -146,7 +188,7 @@ function MentorChatApp() {
   }
 
   function addMentorMessageMarkdown(text) {
-    setMessages(prev => [
+    setMessages((prev) => [
       ...prev,
       {
         id: prev.length + 1,
