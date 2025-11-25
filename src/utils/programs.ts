@@ -14,6 +14,7 @@ export type Program = {
     objectives: string;
     level: string;
     label: string;
+    resources: string[];
     modules: ProgramModule[];
 };
 
@@ -51,6 +52,7 @@ export function getProgramPrompt(programs: Programs, programID: string, date: Da
         "program_label": programs[programID].label,
         "program_objective": programs[programID].objectives,
         "program_level": programs[programID].level,
+        "program_resources": programs[programID].resources.join(", "),
         "program_modules": modules.map((module) => `- ${module.label} : ${module.content.join(", ")}`).join("\n")
     });
 };

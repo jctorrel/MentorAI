@@ -2,25 +2,28 @@
   "A1": {
     "label": "Année 1 - Développeur des métiers du numérique",
     "objectives": "bases du web et métiers du numérique",
-    "level" : "première année post-bac",
+    "level": "première année post-bac",
+    "resources": [
+      "Creative suite",
+      "Hébergement pour Wordpress",
+      "Figma pro",
+      "GSuite education",
+      "Tout contenu gratuit en ligne (tutoriels, documentations, forums, etc.)"
+    ],
     "modules": [
       {
         "id": "wordpress",
         "label": "Wordpress",
         "start_month": 9,
         "end_month": 10,
-        "content": [
-          "installation, configuration et déploiement"
-        ]
+        "content": ["installation, configuration et déploiement"]
       },
       {
         "id": "creation-graphique",
         "label": "Création graphique",
         "start_month": 9,
         "end_month": 11,
-        "content": [
-          "Photoshop, Illustrator, Indesign"
-        ]
+        "content": ["Photoshop, Illustrator, Indesign"]
       },
       {
         "id": "photos-videos",
@@ -36,9 +39,7 @@
         "label": "Marketing digital",
         "start_month": 12,
         "end_month": 2,
-        "content": [
-          "SEO / SMO"
-        ]
+        "content": ["SEO / SMO"]
       },
       {
         "id": "projet-annee",
