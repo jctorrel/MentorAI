@@ -11,6 +11,7 @@ const fakePrograms: Programs = {
         objectives: "Objectif du programme A1",
         label: "Titre du programme A1",
         level: "Niveau du programme A1",
+        resources: ["Ressource A1-1", "Ressource A1-2"],
         modules: [
             {
                 id: "module-1",

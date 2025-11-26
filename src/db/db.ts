@@ -16,6 +16,8 @@ export async function initMongo(uri: string, dbName: string = ""): Promise<{ cli
 
   await db.collection("student_summaries").createIndex({ email: 1 }, { unique: true });
   await db.collection("prompts").createIndex({ key: 1 }, { unique: true });
+  await db.collection("configs").createIndex({ key: 1 }, { unique: true });
+  await db.collection("programs").createIndex({ id: 1 }, { unique: true });
 
   logger.info("✅ Mongo connecté");
 

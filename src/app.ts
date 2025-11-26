@@ -8,6 +8,8 @@ import getEnv from "./utils/env";
 import { logger } from "./utils/logger";
 import { getPromptContent } from "./db/prompts";
 import loadConfig from "./utils/configs";
+import { getMentorConfig } from "./db/config";
+import { getProgramsMap } from "./db/programs";
 
 // DB
 const mongoUri = getEnv("MONGODB_URI");
@@ -17,7 +19,7 @@ export const openai = new OpenAI({ apiKey: getEnv("OPENAI_API_KEY") });
 const mentorPromptTemplate = getEnv("MENTOR_PROMPT_TEMPLATE");
 const summaryPromptTemplate = getEnv("SUMMARY_PROMPT_TEMPLATE");
 
-export default async function buildApp(): Promise<express.Express>{
+export default async function buildApp(): Promise<express.Express> {
   const app = express();
 
   // Middlewares
@@ -27,22 +29,34 @@ export default async function buildApp(): Promise<express.Express>{
   // DB
   await initMongo(mongoUri);
 
-  // Configs
-  const mentorConfig = loadConfig("mentor-config.json");
-  const programs = loadConfig("programs.json");
+  // Config
+  const mentorConfig = await getMentorConfig();
+
+  // Programs
+  const programs = await getProgramsMap();
 
   // Prompts
-  const mentorSystemTemplate: Promise<string | null> = getPromptContent(mentorPromptTemplate);
-  const summarySystemTemplate: Promise<string | null> = getPromptContent(summaryPromptTemplate);
+  const mentorSystemTemplate: string | null = await getPromptContent(mentorPromptTemplate);
+  const summarySystemTemplate: string | null = await getPromptContent(summaryPromptTemplate);
 
-  if(!mentorSystemTemplate) {
+  if (!mentorConfig) {
+    logger.error("❌ Config introuvable");
+    throw new Error("Config introuvable");
+  }
+  if (!programs) {
+    logger.error("❌ Programs introuvables");
+    throw new Error("Programs introuvables");
+  }
+  if (!mentorSystemTemplate) {
     logger.error(`❌ Prompt mentor introuvable pour la clé : ${mentorPromptTemplate}`);
     throw new Error(`Prompt mentor introuvable pour la clé : ${mentorPromptTemplate}`);
   }
-  if(!summarySystemTemplate) {
+  if (!summarySystemTemplate) {
     logger.error(`❌ Prompt mentor introuvable pour la clé : ${mentorPromptTemplate}`);
     throw new Error(`Prompt summary introuvable pour la clé : ${summaryPromptTemplate}`);
   }
+
+  logger.info("✅ Config et prompts chargés");
 
   // Routes
   app.use(createApiRouter({
@@ -56,6 +70,47 @@ export default async function buildApp(): Promise<express.Express>{
   return app;
 }
 
+/*
+import "dotenv/config";
+import fs from "fs/promises";
+import path from "path";
+import { closeMongo } from "../src/db/db";
+import { upsertMentorConfig } from "../src/db/config";
+import { upsertProgramsFromObject } from "../src/db/programs";
+
+async function main() {
+  const uri = process.env.MONGODB_URI;
+  const dbName = process.env.MONGODB_DBNAME;
+
+  if (!uri) throw new Error("MONGODB_URI manquant");
+  await initMongo(uri, dbName);
+
+  const PROJECT_ROOT = process.cwd();
+  const rootDir = path.join(PROJECT_ROOT, "config");
+
+  // 1) config.json
+  const configPath = path.join(rootDir, "mentor-config.json");
+  const configRaw = await fs.readFile(configPath, "utf8");
+  const configJson = JSON.parse(configRaw);
+  await upsertMentorConfig(configJson);
+  console.log("✅ mentor_config importé");
+
+  // 2) programs.json
+  const programsPath = path.join(rootDir, "programs.json");
+  const programsRaw = await fs.readFile(programsPath, "utf8");
+  const programsJson = JSON.parse(programsRaw);
+  await upsertProgramsFromObject(programsJson);
+  console.log("✅ programs importés");
+
+  await closeMongo();
+  process.exit(0);
+}
+
+main().catch((err) => {
+  console.error("❌ Erreur lors du seed config/programs :", err);
+  process.exit(1);
+});
+*/
 
 /*
 import fs from "fs/promises";
@@ -65,7 +120,7 @@ import { upsertPrompt } from "../src/db/prompts";
 async function main() {
   const { db } = await initMongo(process.env.MONGODB_URI!, process.env.MONGODB_DBNAME);
 
-const PROJECT_ROOT = process.cwd();
+  const PROJECT_ROOT = process.cwd();
   const promptsDir = path.join(PROJECT_ROOT, "config", "prompts");
   const files = await fs.readdir(promptsDir);
 
