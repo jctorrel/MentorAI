@@ -1,18 +1,25 @@
-// src/components/App.jsx
-
+// src/App.jsx
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MentorChatApp from "./MentorChatApp";
 import Login from "./Login";
 import PrivateRoute from "./PrivateRoute";
+import AdminHome from "./admin/AdminHome";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* page de login publique */}
         <Route path="/login" element={<Login />} />
 
-        {/* tout le reste est protégé */}
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute>
+              <AdminHome />
+            </PrivateRoute>
+          }
+        />
+
         <Route
           path="/"
           element={
@@ -21,7 +28,6 @@ function App() {
             </PrivateRoute>
           }
         />
-        {/* si tu as d'autres routes, tu peux les ajouter ici */}
       </Routes>
     </BrowserRouter>
   );
