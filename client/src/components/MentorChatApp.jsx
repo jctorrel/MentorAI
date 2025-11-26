@@ -1,14 +1,14 @@
 // client/src/MentorChatApp.jsx
 import React, { useEffect, useState } from "react";
-import "./styles.css";
+import "../styles.css";
 
-import Header from "./components/Header.jsx";
-import HelperBar from "./components/HelperBar.jsx";
-import ChatWindow from "./components/ChatWindow.jsx";
-import InputBar from "./components/InputBar.jsx";
-import QuickActions from "./components/QuickActions.jsx";
+import Header from "./Header.jsx";
+import HelperBar from "./HelperBar.jsx";
+import ChatWindow from "./ChatWindow.jsx";
+import InputBar from "./InputBar.jsx";
+import QuickActions from "./QuickActions.jsx";
+import { apiFetch } from "../api";
 
-const DEFAULT_EMAIL = "etudiant.test@normandiewebschool.fr";
 const PROGRAM_ID = "A1";
 
 const INIT_MESSAGE =
@@ -27,9 +27,8 @@ const DEFAULT_MESSAGES = [
   }
 ];
 
-// Les noms de mois en français
 const MONTHS = [
-  "", // index 0 (inutile)
+  "",
   "janvier",
   "février",
   "mars",
@@ -68,8 +67,10 @@ export function buildInitMessage(modules) {
 }
 
 function getStudentEmail() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("email") || DEFAULT_EMAIL;
+  const userJson = localStorage.getItem("user");
+  const user = userJson ? JSON.parse(userJson) : null;
+
+  return user?.email;
 }
 
 function MentorChatApp() {
@@ -82,6 +83,7 @@ function MentorChatApp() {
   const [backendStatusLabel, setBackendStatusLabel] = useState("Hors ligne");
   const [inputValue, setInputValue] = useState("");
   const [modules, setModules] = useState([]);
+  const token = localStorage.getItem("access_token");
 
   // Health check
   useEffect(() => {
@@ -89,12 +91,11 @@ function MentorChatApp() {
 
     async function checkBackendStatus() {
       try {
-        const res = await fetch("/api/health", { method: "GET" });
-        const data = await res.json().catch(() => ({}));
+        const data = await apiFetch("/api/health", { method: "GET" });
 
         if (!isMounted) return;
 
-        if (!res.ok || !data) {
+        if (!data.ok || !data) {
           setBackendOnline(false);
           setBackendStatusLabel("Hors ligne (erreur serveur)");
           return;
@@ -138,16 +139,9 @@ function MentorChatApp() {
       try {
         const requestOptions = {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ programID: PROGRAM_ID })
         };
-
-        const res = await fetch("/api/init", requestOptions);
-        if (!res.ok) {
-          throw new Error("Réponse non OK de /api/init");
-        }
-
-        const data = await res.json();
+        const data = await apiFetch("/api/init", requestOptions);
 
         if (!data.modules || !Array.isArray(data.modules)) {
           console.warn("Format inattendu de /api/init");
@@ -213,17 +207,15 @@ function MentorChatApp() {
       setIsTyping(true);
       setError("");
 
-      const resp = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      let mentorText =
-        "Une erreur est survenue lors de la réponse du mentor. Réessaie plus tard.";
-
       try {
-        const data = await resp.json();
+        const data = await apiFetch("/api/chat", {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+
+        let mentorText =
+          "Une erreur est survenue lors de la réponse du mentor. Réessaie plus tard.";
+
         if (data && data.mentorReply) {
           mentorText = data.mentorReply;
         }

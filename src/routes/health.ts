@@ -2,11 +2,12 @@
 import express from "express";
 import { logger } from "../utils/logger";
 import type OpenAI from "openai";
+import { AuthRequest } from "../middleware/authMiddleware";
 
 export default function createHealthRouter(openai: OpenAI): express.Router {
     const router = express.Router();
 
-    router.get("/health", async (_req, res) => {
+    router.get("/health", async (_req:AuthRequest, res) => {
         try {
             const openaiOk = await testOpenAIConnection(openai);
             // Si ok => 200, sinon => 503

@@ -1,3 +1,5 @@
+// src/components/ChatWindow.jsx
+
 import React, { useEffect, useRef } from "react";
 import MessageBubble from "./MessageBubble.jsx";
 import TypingBubble from "./TypingBubble.jsx";

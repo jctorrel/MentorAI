@@ -3,11 +3,12 @@ import express from "express";
 import { logger } from "../utils/logger";
 import { getActiveModules } from "../utils/programs";
 import type { ProgramModule, Programs } from "../utils/programs";
+import { AuthRequest } from "../middleware/authMiddleware";
 
 export default function createInitRouter(programs: Programs): express.Router {
     const router = express.Router();
 
-    router.post("/init", async (_req, res) => {
+    router.post("/init", async (_req:AuthRequest, res) => {
         const { programID } = _req.body;
 
         if (!programID) {

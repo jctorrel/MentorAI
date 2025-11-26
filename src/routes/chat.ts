@@ -6,13 +6,14 @@ import { logger } from "../utils/logger";
 import { render } from "../utils/prompts";
 import { getProgramPrompt } from "../utils/programs";
 import getEnv from "../utils/env";
+import { AuthRequest } from "../middleware/authMiddleware";
 
 const MENTOR_MODEL = getEnv("MENTOR_MODEL");
 
 export default function createChatRouter(args: any): express.Router {
     const router = express.Router();
 
-    router.post("/chat", async (_req, res) => {
+    router.post("/chat", async (_req: AuthRequest, res) => {
         try {
             const { email, message, programID } = _req.body;
 
