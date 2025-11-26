@@ -1,6 +1,6 @@
 // src/db/summaries.ts
-import { render } from "../utils/prompts";
-import { getDb } from "./client";
+import render from "../utils/prompts";
+import { getDb } from "./db";
 import getEnv from "../utils/env";
 import { openai } from "../app";
 

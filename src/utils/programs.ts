@@ -1,6 +1,8 @@
 // src/utils/programs.ts
 import { logger } from "./logger";
-import { loadPrompt, render } from "./prompts";
+import render from "./prompts";
+import { getPromptContent } from "../db/prompts";
+import getEnv from "./env";
 
 export type ProgramModule = {
     id: string;
@@ -19,6 +21,8 @@ export type Program = {
 };
 
 export type Programs = Record<string, Program>;
+
+const programsPromptTemplate = getEnv("PROGRAMS_PROMPT_TEMPLATE");
 
 export function getActiveModules(programs: Programs, programID: string, date: Date = new Date()): ProgramModule[] {
     const program: Program = programs[programID];
@@ -44,11 +48,16 @@ export function getActiveModules(programs: Programs, programID: string, date: Da
     });
 }
 
-export function getProgramPrompt(programs: Programs, programID: string, date: Date = new Date()) {
-    const programPromptTemplate: string = loadPrompt("program.txt");
+export async function getProgramPrompt(programs: Programs, programID: string, date: Date = new Date()) {
+    const programSystemTemplate: string |null = await getPromptContent(programsPromptTemplate);
     const modules: ProgramModule[] = getActiveModules(programs, programID, date);
 
-    return render(programPromptTemplate, {
+    if(!programSystemTemplate) {
+        logger.error(`❌ Prompt programme introuvable pour la clé : ${programsPromptTemplate}`);
+        throw new Error(`Prompt programme introuvable pour la clé : ${programsPromptTemplate}`);
+    }
+
+    return render(programSystemTemplate, {
         "program_label": programs[programID].label,
         "program_objective": programs[programID].objectives,
         "program_level": programs[programID].level,

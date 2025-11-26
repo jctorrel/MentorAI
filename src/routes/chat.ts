@@ -1,9 +1,9 @@
-// routes/health.js
+// routes/chat.js
 import express from "express";
 
 import { getStudentSummary, createStudentSummary } from "../db/summaries";
 import { logger } from "../utils/logger";
-import { render } from "../utils/prompts";
+import render from "../utils/prompts";
 import { getProgramPrompt } from "../utils/programs";
 import getEnv from "../utils/env";
 import { AuthRequest } from "../middleware/authMiddleware";
@@ -25,7 +25,7 @@ export default function createChatRouter(args: any): express.Router {
 
             // Construction du prompt
             const previousSummary: string = await getStudentSummary(email);
-            const systemPrompt: string = getSystemPrompt(args, email, programID, previousSummary);
+            const systemPrompt: string = await getSystemPrompt(args, email, programID, previousSummary);
 
             // OpenAI
             const reply = await args.openai.responses.create({
@@ -53,8 +53,8 @@ export default function createChatRouter(args: any): express.Router {
     return router;
 }
 
-function getSystemPrompt(args: any, email: string, programID: string, summary: string): string {
-    const program_context: string = getProgramPrompt(args.programs, programID);
+async function getSystemPrompt(args: any, email: string, programID: string, summary: string): Promise<string> {
+    const program_context: string = await getProgramPrompt(args.programs, programID);
 
     return render(args.mentorSystemTemplate, {
         "email": email,

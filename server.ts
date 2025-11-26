@@ -8,7 +8,7 @@ import { shutdown } from "./src/utils/shutdown";
 const port = Number(getEnv("PORT", "4000"));
 
 // Start
-const app = buildApp();
+const app = await buildApp();
 const server = createServer(app);
 
 // Signaux

@@ -10,6 +10,7 @@ export default function createInitRouter(programs: Programs): express.Router {
 
     router.post("/init", async (_req:AuthRequest, res) => {
         const { programID } = _req.body;
+        console.log('Received /init request with programID:', programID);
 
         if (!programID) {
             return res

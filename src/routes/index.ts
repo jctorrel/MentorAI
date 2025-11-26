@@ -6,6 +6,7 @@ import createHealthRouter from "./health";
 import createChatRouter from "./chat";
 import createInitRouter from "./init";
 import createAuthRouter from "./auth";
+import { logger } from "../utils/logger";
 
 export default function createApiRouter(args: any): express.Router {
     const router = express.Router();
@@ -18,6 +19,8 @@ export default function createApiRouter(args: any): express.Router {
     router.use("/api", createHealthRouter(args.openai));
     router.use("/api", createInitRouter(args.programs));
     router.use("/api", createChatRouter(args));
+
+    logger.info('✅ API routes initialized.');
 
     return router;
 }

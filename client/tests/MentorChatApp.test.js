@@ -1,7 +1,7 @@
 // tests/client/MentorChatApp.test.js
 
 import { describe, it, expect } from 'vitest';
-import { buildInitMessage } from "../src/MentorChatApp.jsx";
+import { buildInitMessage } from "../src/components/MentorChatApp.jsx";
 
 describe("buildInitMessage", () => {
     it("génère un message correct à partir de modules", () => {

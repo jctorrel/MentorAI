@@ -1,5 +1,0 @@
- - Nom : {{program_label}}
- - Objectif : {{program_objective}}
- - Niveau : {{program_level}}
- - Priorités : 
-{{program_modules}}

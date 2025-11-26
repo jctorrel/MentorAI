@@ -22,12 +22,7 @@ export default function createHealthRouter(openai: OpenAI): express.Router {
 }
 
 async function testOpenAIConnection(openai: OpenAI): Promise<boolean> {
-  if (process.env.NODE_ENV === 'test') {
-    return true;
-  }
-
   try {
-    // Appel ultra léger
     await openai.models.list();
     return true;
   } catch (err) {

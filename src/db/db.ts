@@ -2,8 +2,8 @@
 import { Db, MongoClient } from "mongodb";
 import { logger } from "../utils/logger";
 
-let client: MongoClient | undefined;
-let db: Db | undefined;
+let client: MongoClient;
+let db: Db;
 
 export async function initMongo(uri: string, dbName: string = ""): Promise<{ client: MongoClient; db: Db }> {
   if (db) return { client, db };
@@ -15,6 +15,7 @@ export async function initMongo(uri: string, dbName: string = ""): Promise<{ cli
   db = dbName ? client.db(dbName) : client.db();
 
   await db.collection("student_summaries").createIndex({ email: 1 }, { unique: true });
+  await db.collection("prompts").createIndex({ key: 1 }, { unique: true });
 
   logger.info("✅ Mongo connecté");
 
