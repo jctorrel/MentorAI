@@ -1,54 +1,22 @@
 // src/pages/AdminHome.jsx
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { apiFetch } from "../../api";
+import { useNavigate } from "react-router-dom";
+import { apiFetch } from "../../api"; 
 
 function AdminHome() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [error, setError] = useState("");
-  const [config, setConfig] = useState(null);
+  const [config, setConfig] = useState({
+    school_name: "",
+    tone: "",
+    rules: "",
+  });
+  const [savingConfig, setSavingConfig] = useState(false);
+  const [saveMessage, setSaveMessage] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function checkAdmin() {
-      setLoading(true);
-      setError("");
-
-      try {
-        // simple "ping" : si on a accès à /api/admin/config -> on est admin
-        const cfg = await apiFetch("/api/admin/config");
-        if (cancelled) return;
-        setConfig(cfg);
-        setIsAdmin(true);
-      } catch (e) {
-        if (cancelled) return;
-
-        // apiFetch renvoie Error("not_authorized") si 403 { error: "not_authorized" }
-        const msg = e?.message || "Erreur d'accès à l'administration";
-        setError(msg);
-
-        if (msg === "not_authorized") {
-          setIsAdmin(false);
-        } else {
-          // erreur inconnue : on peut afficher un message, mais on reste sur la page
-          setIsAdmin(false);
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-
-    checkAdmin();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // Pour afficher l'utilisateur courant (stocké au login)
+  // Récupérer user pour l'affichage
   let currentUserEmail = "";
   try {
     const raw = localStorage.getItem("user");
@@ -60,6 +28,88 @@ function AdminHome() {
     // ignore
   }
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function checkAdminAndLoadConfig() {
+      setLoading(true);
+      setError("");
+      setSaveMessage("");
+
+      try {
+        // ✅ Sert à la fois de check admin ET de chargement de la config
+        const cfg = await apiFetch("/api/admin/config");
+        if (cancelled) return;
+
+        setConfig({
+          school_name: cfg.school_name || "",
+          tone: cfg.tone || "",
+          rules: cfg.rules || "",
+        });
+        setIsAdmin(true);
+      } catch (e) {
+        if (cancelled) return;
+
+        const msg = e?.message || "Erreur d'accès à l'administration";
+        setError(msg);
+
+        if (msg === "not_authorized") {
+          setIsAdmin(false);
+        } else {
+          setIsAdmin(false);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    checkAdminAndLoadConfig();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function handleConfigSave(e) {
+    e.preventDefault();
+    setSavingConfig(true);
+    setSaveMessage("");
+    setError("");
+
+    try {
+      const body = {
+        school_name: config.school_name,
+        tone: config.tone,
+        rules: config.rules,
+      };
+
+      const saved = await apiFetch("/api/admin/config", {
+        method: "PUT",
+        body: JSON.stringify(body),
+      });
+
+      setConfig({
+        school_name: saved.school_name,
+        tone: saved.tone,
+        rules: saved.rules,
+      });
+
+      setSaveMessage("Configuration sauvegardée ✔");
+    } catch (e) {
+      setError(e?.message || "Erreur lors de la sauvegarde de la config");
+    } finally {
+      setSavingConfig(false);
+    }
+  }
+
+  function handleConfigFieldChange(e) {
+    const { name, value } = e.target;
+    setConfig((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
+
   return (
     <div style={styles.page}>
       <div style={styles.card}>
@@ -67,7 +117,7 @@ function AdminHome() {
           <div>
             <h1 style={styles.title}>Administration</h1>
             <p style={styles.subtitle}>
-              Interface de gestion du mentor IA
+              Interface de gestion du mentor IA (config + prompts + programmes)
             </p>
           </div>
           {currentUserEmail && (
@@ -94,60 +144,112 @@ function AdminHome() {
 
         {!loading && isAdmin && (
           <>
-            {config && (
-              <div style={styles.configSummary}>
-                <h2 style={styles.sectionTitle}>Configuration actuelle</h2>
-                <p style={styles.configLine}>
-                  <strong>Établissement :</strong> {config.school_name}
-                </p>
-                <p style={styles.configLine}>
-                  <strong>Tonalité :</strong> {config.tone}
-                </p>
-              </div>
-            )}
-
-            <h2 style={styles.sectionTitle}>Sections disponibles</h2>
-            <div style={styles.grid}>
-              <Link to="/admin/config" style={styles.cardLink}>
-                <div style={styles.sectionCard}>
-                  <h3 style={styles.sectionCardTitle}>Config générale</h3>
-                  <p style={styles.sectionCardText}>
-                    Nom de l’école, tonalité, règles globales du mentor.
-                  </p>
-                </div>
-              </Link>
-
-              <Link to="/admin/prompts" style={styles.cardLink}>
-                <div style={styles.sectionCard}>
-                  <h3 style={styles.sectionCardTitle}>Prompts</h3>
-                  <p style={styles.sectionCardText}>
-                    Gérer les prompts utilisés par le mentor (à venir).
-                  </p>
-                </div>
-              </Link>
-
-              <Link to="/admin/programs" style={styles.cardLink}>
-                <div style={styles.sectionCard}>
-                  <h3 style={styles.sectionCardTitle}>Programmes</h3>
-                  <p style={styles.sectionCardText}>
-                    Gérer les programmes, modules et contenus (à venir).
-                  </p>
-                </div>
-              </Link>
-            </div>
-
-            {error && error !== "not_authorized" && (
+            {error && (
               <p style={styles.errorTextSmall}>
                 Une erreur est survenue : {error}
               </p>
             )}
 
-            <button
-              style={styles.buttonSecondary}
-              onClick={() => navigate("/")}
-            >
-              ← Retour à l’application
-            </button>
+            {/* SECTION CONFIG GÉNÉRALE */}
+            <section style={styles.section}>
+              <h2 style={styles.sectionTitle}>Configuration générale</h2>
+              <p style={styles.sectionHelp}>
+                Paramètres globaux utilisés par le mentor (nom de l’école,
+                tonalité des réponses, règles de sécurité…).
+              </p>
+
+              <form style={styles.form} onSubmit={handleConfigSave}>
+                <div style={styles.field}>
+                  <label style={styles.label} htmlFor="school_name">
+                    Nom de l’école
+                  </label>
+                  <input
+                    id="school_name"
+                    name="school_name"
+                    type="text"
+                    value={config.school_name}
+                    onChange={handleConfigFieldChange}
+                    style={styles.input}
+                    placeholder="Normandie Web School"
+                  />
+                </div>
+
+                <div style={styles.field}>
+                  <label style={styles.label} htmlFor="tone">
+                    Tonalité du mentor
+                  </label>
+                  <input
+                    id="tone"
+                    name="tone"
+                    type="text"
+                    value={config.tone}
+                    onChange={handleConfigFieldChange}
+                    style={styles.input}
+                    placeholder="concis, professionnel, bienveillant…"
+                  />
+                  <p style={styles.fieldHint}>
+                    Par exemple : <em>“concis, professionnel”</em>
+                  </p>
+                </div>
+
+                <div style={styles.field}>
+                  <label style={styles.label} htmlFor="rules">
+                    Règles globales
+                  </label>
+                  <textarea
+                    id="rules"
+                    name="rules"
+                    value={config.rules}
+                    onChange={handleConfigFieldChange}
+                    style={styles.textarea}
+                    rows={4}
+                    placeholder="jamais quitter école, escalade humaine si détresse…"
+                  />
+                  <p style={styles.fieldHint}>
+                    Tu peux préciser les contraintes de sécurité, la gestion des
+                    cas sensibles, etc.
+                  </p>
+                </div>
+
+                <div style={styles.actions}>
+                  <button
+                    type="submit"
+                    style={styles.buttonPrimary}
+                    disabled={savingConfig}
+                  >
+                    {savingConfig ? "Sauvegarde…" : "Sauvegarder la config"}
+                  </button>
+                  <button
+                    type="button"
+                    style={styles.buttonSecondary}
+                    onClick={() => navigate("/")}
+                  >
+                    ← Retour à l’application
+                  </button>
+                </div>
+
+                {saveMessage && (
+                  <p style={styles.successText}>{saveMessage}</p>
+                )}
+              </form>
+            </section>
+
+            {/* SECTION PROMPTS & PROGRAMMES (placeholders pour la suite) */}
+            <section style={styles.sectionMuted}>
+              <h2 style={styles.sectionTitle}>Prompts</h2>
+              <p style={styles.sectionHelp}>
+                Cette section permettra de gérer les prompts du mentor
+                directement depuis l’interface (à implémenter).
+              </p>
+            </section>
+
+            <section style={styles.sectionMuted}>
+              <h2 style={styles.sectionTitle}>Programmes</h2>
+              <p style={styles.sectionHelp}>
+                Cette section permettra de gérer les programmes, modules et
+                contenus pédagogiques (à implémenter).
+              </p>
+            </section>
           </>
         )}
       </div>
@@ -158,7 +260,6 @@ function AdminHome() {
 const styles = {
   page: {
     minHeight: "100vh",
-    width: "1120px",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
@@ -172,7 +273,7 @@ const styles = {
     backgroundColor: "white",
     borderRadius: "1.5rem",
     padding: "2rem",
-    maxWidth: "1120px",
+    maxWidth: "900px",
     width: "100%",
     boxShadow: "0 20px 40px rgba(15, 23, 42, 0.12)",
   },
@@ -237,59 +338,88 @@ const styles = {
     marginBottom: "0.75rem",
   },
   errorTextSmall: {
-    marginTop: "0.75rem",
+    marginTop: "0.5rem",
     fontSize: "0.8rem",
     color: "#ef4444",
   },
-  configSummary: {
-    marginBottom: "1.5rem",
-    padding: "1rem 1.25rem",
-    borderRadius: "1rem",
-    backgroundColor: "#f8fafc",
-    border: "1px solid #e2e8f0",
+  successText: {
+    marginTop: "0.5rem",
+    fontSize: "0.85rem",
+    color: "#16a34a",
   },
-  configLine: {
-    margin: "0.25rem 0",
-    fontSize: "0.9rem",
-    color: "#334155",
+  section: {
+    marginTop: "1.5rem",
+    paddingTop: "1.5rem",
+    borderTop: "1px solid #e5e7eb",
+  },
+  sectionMuted: {
+    marginTop: "1.5rem",
+    paddingTop: "1.5rem",
+    borderTop: "1px dashed #e5e7eb",
+    opacity: 0.8,
   },
   sectionTitle: {
     margin: 0,
-    marginBottom: "0.75rem",
+    marginBottom: "0.5rem",
     fontSize: "1.1rem",
     fontWeight: 600,
     color: "#0f172a",
   },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-    gap: "1rem",
-    marginBottom: "1.5rem",
-  },
-  cardLink: {
-    textDecoration: "none",
-  },
-  sectionCard: {
-    borderRadius: "1rem",
-    padding: "1rem 1.25rem",
-    border: "1px solid #e2e8f0",
-    backgroundColor: "#ffffff",
-    transition: "transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s",
-  },
-  sectionCardTitle: {
+  sectionHelp: {
     margin: 0,
-    marginBottom: "0.25rem",
-    fontSize: "1rem",
+    marginBottom: "1rem",
+    fontSize: "0.9rem",
+    color: "#6b7280",
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "1rem",
+  },
+  field: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.25rem",
+  },
+  label: {
+    fontSize: "0.85rem",
     fontWeight: 600,
     color: "#0f172a",
   },
-  sectionCardText: {
+  input: {
+    borderRadius: "0.75rem",
+    border: "1px solid #d1d5db",
+    padding: "0.5rem 0.75rem",
+    fontSize: "0.9rem",
+  },
+  textarea: {
+    borderRadius: "0.75rem",
+    border: "1px solid #d1d5db",
+    padding: "0.5rem 0.75rem",
+    fontSize: "0.9rem",
+    resize: "vertical",
+  },
+  fieldHint: {
     margin: 0,
-    fontSize: "0.85rem",
-    color: "#64748b",
+    fontSize: "0.8rem",
+    color: "#9ca3af",
+  },
+  actions: {
+    display: "flex",
+    gap: "0.5rem",
+    alignItems: "center",
+  },
+  buttonPrimary: {
+    padding: "0.5rem 1rem",
+    borderRadius: "999px",
+    border: "none",
+    backgroundColor: "#2563eb",
+    color: "white",
+    fontSize: "0.9rem",
+    fontWeight: 500,
+    cursor: "pointer",
   },
   buttonSecondary: {
-    marginTop: "0.5rem",
     padding: "0.5rem 0.9rem",
     borderRadius: "999px",
     border: "1px solid #cbd5f5",
