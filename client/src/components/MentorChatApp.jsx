@@ -207,14 +207,14 @@ function MentorChatApp() {
       setIsTyping(true);
       setError("");
 
+
+      let mentorText = "Une erreur est survenue lors de la réponse du mentor. Réessaie plus tard.";
+
       try {
         const data = await apiFetch("/api/chat", {
           method: "POST",
           body: JSON.stringify(payload)
         });
-
-        let mentorText =
-          "Une erreur est survenue lors de la réponse du mentor. Réessaie plus tard.";
 
         if (data && data.mentorReply) {
           mentorText = data.mentorReply;

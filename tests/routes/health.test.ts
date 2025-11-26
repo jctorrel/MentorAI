@@ -9,6 +9,10 @@ const fakeOpenAI = {
   },
 } as any;
 
+jest.mock("../../src/utils/programs", () => ({
+  getProgramPrompt: jest.fn().mockReturnValue("PROGRAM PROMPT"),
+}));
+
 const app = express();
 app.use('/api', createHealthRouter(fakeOpenAI));
 
