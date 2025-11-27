@@ -9,7 +9,7 @@ import { logger } from "./utils/logger";
 import { getPromptContent } from "./db/prompts";
 import loadConfig from "./utils/configs";
 import { getMentorConfig } from "./db/config";
-import { getProgramsMap } from "./db/programs";
+import { listPrograms } from "./db/programs";
 
 // DB
 const mongoUri = getEnv("MONGODB_URI");
@@ -33,7 +33,7 @@ export default async function buildApp(): Promise<express.Express> {
   const mentorConfig = await getMentorConfig();
 
   // Programs
-  const programs = await getProgramsMap();
+  const programs = await listPrograms();
 
   // Prompts
   const mentorSystemTemplate: string | null = await getPromptContent(mentorPromptTemplate);
@@ -69,73 +69,3 @@ export default async function buildApp(): Promise<express.Express> {
 
   return app;
 }
-
-/*
-import "dotenv/config";
-import fs from "fs/promises";
-import path from "path";
-import { closeMongo } from "../src/db/db";
-import { upsertMentorConfig } from "../src/db/config";
-import { upsertProgramsFromObject } from "../src/db/programs";
-
-async function main() {
-  const uri = process.env.MONGODB_URI;
-  const dbName = process.env.MONGODB_DBNAME;
-
-  if (!uri) throw new Error("MONGODB_URI manquant");
-  await initMongo(uri, dbName);
-
-  const PROJECT_ROOT = process.cwd();
-  const rootDir = path.join(PROJECT_ROOT, "config");
-
-  // 1) config.json
-  const configPath = path.join(rootDir, "mentor-config.json");
-  const configRaw = await fs.readFile(configPath, "utf8");
-  const configJson = JSON.parse(configRaw);
-  await upsertMentorConfig(configJson);
-  console.log("✅ mentor_config importé");
-
-  // 2) programs.json
-  const programsPath = path.join(rootDir, "programs.json");
-  const programsRaw = await fs.readFile(programsPath, "utf8");
-  const programsJson = JSON.parse(programsRaw);
-  await upsertProgramsFromObject(programsJson);
-  console.log("✅ programs importés");
-
-  await closeMongo();
-  process.exit(0);
-}
-
-main().catch((err) => {
-  console.error("❌ Erreur lors du seed config/programs :", err);
-  process.exit(1);
-});
-*/
-
-/*
-import fs from "fs/promises";
-import path from "path";
-import { upsertPrompt } from "../src/db/prompts";
-
-async function main() {
-  const { db } = await initMongo(process.env.MONGODB_URI!, process.env.MONGODB_DBNAME);
-
-  const PROJECT_ROOT = process.cwd();
-  const promptsDir = path.join(PROJECT_ROOT, "config", "prompts");
-  const files = await fs.readdir(promptsDir);
-
-  for (const file of files) {
-    if (!file.endsWith(".txt")) continue;
-    const key = path.basename(file, ".txt");
-    const content = await fs.readFile(path.join(promptsDir, file), "utf8");
-    await upsertPrompt(key, content, { label: key, type: "system" });
-    console.log(`✅ Importé : ${file} -> key=${key}`);
-  }
-
-  process.exit(0);
-}
-
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});*/

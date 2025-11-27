@@ -1,14 +1,16 @@
 
 import express from "express";
 
-import { requireAuth } from "../middleware/authMiddleware";
-import { requireAdmin } from "../middleware/adminMiddleware";
+import { logger } from "../utils/logger";
 import createHealthRouter from "./health";
 import createChatRouter from "./chat";
 import createInitRouter from "./init";
 import createAuthRouter from "./auth";
 import createConfigRouter from "./admin/config";
-import { logger } from "../utils/logger";
+import createPromptsRouter from "./admin/prompts";
+import createProgramsRouter from "./admin/programs";
+import { requireAuth } from "../middleware/authMiddleware";
+import { requireAdmin } from "../middleware/adminMiddleware";
 
 export default function createApiRouter(args: any): express.Router {
     const router = express.Router();
@@ -25,6 +27,8 @@ export default function createApiRouter(args: any): express.Router {
     // Routes admin
     router.use(requireAdmin);
     router.use("/api/admin", createConfigRouter());
+    router.use("/api/admin/prompts", createPromptsRouter());
+    router.use("/api/admin/programs", createProgramsRouter());
 
     logger.info('✅ API routes initialized.');
 

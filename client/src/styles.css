@@ -31,7 +31,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: stretch;
-    overflow: hidden;
 }
 
 .logo {
@@ -157,7 +156,6 @@ body {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    overflow-y: auto;
 }
 
 .msg-row {

@@ -1,8 +1,8 @@
 // src/App.jsx
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MentorChatApp from "./MentorChatApp";
-import Login from "./Login";
-import PrivateRoute from "./PrivateRoute";
+import Login from "../components/Login";
+import PrivateRoute from "../components/PrivateRoute";
 import AdminHome from "./admin/AdminHome";
 
 function App() {
