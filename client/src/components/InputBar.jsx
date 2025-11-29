@@ -1,7 +1,7 @@
 // client/src/components/InputBar.jsx
 import React from "react";
 
-function InputBar({ value, onChange, onSubmit, disabled }) {
+function InputBar({ value, onChange, onSubmit, disabled, placeholder = "Tapez votre message..." }) {
     return (
         <form
             onSubmit={onSubmit}
@@ -11,7 +11,7 @@ function InputBar({ value, onChange, onSubmit, disabled }) {
                 type="text"
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                placeholder="Tapez votre message..."
+                placeholder={placeholder}
                 disabled={disabled}
                 className="flex-1 px-2.5 py-2 rounded-xl border border-gray-300 bg-white text-gray-900 text-[13px] outline-none transition-all duration-150 placeholder:text-gray-500 focus:border-nws-purple focus:ring-1 focus:ring-nws-purple/12 disabled:opacity-50 disabled:cursor-not-allowed"
             />

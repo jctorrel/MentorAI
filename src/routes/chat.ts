@@ -34,7 +34,6 @@ export default function createChatRouter(args: any): express.Router {
                 input: message
             });
             const mentorReply: string = reply.output_text.trim();
-            console.log("Réponse du mentor :", mentorReply);
 
             // Réponse du mentor
             res.json({ mentorReply });

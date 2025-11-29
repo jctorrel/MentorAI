@@ -46,13 +46,16 @@ export function useChatSession(studentEmail, initialMessages = []) {
 
     /**
      * Envoie un message au backend et récupère la réponse du mentor
+     * @param {string} message - Le message à envoyer
+     * @param {string} mode - Le mode actuel ("guided" ou "free")
      */
     const sendMessage = useCallback(
-        async (message) => {
+        async (message, mode = "guided") => {
             const payload = {
                 email: studentEmail,
                 message,
                 programID: PROGRAM_ID,
+                mode, // Ajouter le mode au payload
             };
 
             try {
@@ -84,14 +87,16 @@ export function useChatSession(studentEmail, initialMessages = []) {
 
     /**
      * Gère la soumission d'un message utilisateur
+     * @param {string} text - Le texte du message
+     * @param {string} mode - Le mode actuel ("guided" ou "free")
      */
     const handleUserMessage = useCallback(
-        async (text) => {
+        async (text, mode = "guided") => {
             const trimmedText = text.trim();
             if (!trimmedText || isLoading) return;
 
             addUserMessage(trimmedText);
-            await sendMessage(trimmedText);
+            await sendMessage(trimmedText, mode);
         },
         [isLoading, addUserMessage, sendMessage]
     );

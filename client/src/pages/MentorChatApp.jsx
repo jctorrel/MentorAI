@@ -2,6 +2,7 @@
 import React, { useState, useCallback } from "react";
 
 import Header from "../components/Header.jsx";
+import TabBar from "../components/TabBar.jsx";
 import HelperBar from "../components/HelperBar.jsx";
 import ChatWindow from "../components/ChatWindow.jsx";
 import InputBar from "../components/InputBar.jsx";
@@ -15,6 +16,8 @@ import { getCurrentUserEmail } from "../utils/storage";
 function MentorChatApp() {
     const [studentEmail] = useState(getCurrentUserEmail);
     const [inputValue, setInputValue] = useState("");
+    const [activeMode, setActiveMode] = useState("guided"); // "guided" ou "free"
+    const [shouldShowModules, setShouldShowModules] = useState(true);
 
     // Hook pour surveiller l'état du backend
     const { online: backendOnline, statusLabel: backendStatusLabel } = useBackendHealth();
@@ -40,12 +43,27 @@ function MentorChatApp() {
     const { modules, clearModules } = useModules(handleModulesInitialized);
 
     /**
+     * Gère le changement de mode
+     */
+    const handleModeChange = (newMode) => {
+        setActiveMode(newMode);
+        
+        // En mode libre, on cache les modules
+        // En mode guidé, on les réaffiche s'ils existent
+        if (newMode === "free") {
+            setShouldShowModules(false);
+        } else {
+            setShouldShowModules(true);
+        }
+    };
+
+    /**
      * Gère le clic sur un module dans les QuickActions
      */
     const handleModuleClick = async (module) => {
         const text = `Je veux travailler sur le module "${module.label}"`;
-        clearModules();
-        await handleUserMessage(text);
+        setShouldShowModules(false); // Cacher après sélection
+        await handleUserMessage(text, "guided");
     };
 
     /**
@@ -57,8 +75,13 @@ function MentorChatApp() {
         if (!text || isLoading) return;
 
         setInputValue("");
-        clearModules();
-        await handleUserMessage(text);
+        
+        // En mode guidé, on masque les modules après envoi
+        if (activeMode === "guided") {
+            setShouldShowModules(false);
+        }
+        
+        await handleUserMessage(text, activeMode);
     };
 
     return (
@@ -69,21 +92,38 @@ function MentorChatApp() {
                     backendStatusLabel={backendStatusLabel}
                 />
 
+                <TabBar 
+                    activeMode={activeMode}
+                    onModeChange={handleModeChange}
+                />
+
                 <div className="grid grid-rows-[auto_1fr_auto] gap-2 flex-1 min-h-0">
-                    <HelperBar studentEmail={studentEmail} />
+                    <HelperBar 
+                        studentEmail={studentEmail}
+                        mode={activeMode}
+                    />
 
                     <ChatWindow messages={messages} isTyping={isTyping} />
 
                     <div>
-                        <QuickActions
-                            modules={modules}
-                            onModuleClick={handleModuleClick}
-                        />
+                        {/* Afficher les QuickActions uniquement en mode guidé ET si shouldShowModules est true */}
+                        {activeMode === "guided" && shouldShowModules && (
+                            <QuickActions
+                                modules={modules}
+                                onModuleClick={handleModuleClick}
+                            />
+                        )}
+                        
                         <InputBar
                             value={inputValue}
                             onChange={setInputValue}
                             onSubmit={handleSubmit}
                             disabled={isLoading}
+                            placeholder={
+                                activeMode === "free" 
+                                    ? "Posez n'importe quelle question..." 
+                                    : "Tapez votre message..."
+                            }
                         />
                         {error && (
                             <div className="text-xs text-red-700 px-2 py-1 mt-1 bg-red-50 rounded-lg border border-red-200">
