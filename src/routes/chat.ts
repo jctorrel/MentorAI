@@ -15,17 +15,17 @@ export default function createChatRouter(args: any): express.Router {
 
     router.post("/chat", async (_req: AuthRequest, res) => {
         try {
-            const { email, message, programID } = _req.body;
+            const { email, message, programID, mode } = _req.body;
 
-            if (!email || !message || !programID) {
+            if (!email || !message || !programID || !mode) {
                 return res
                     .status(400)
-                    .json({ reply: "email, message et programID sont requis." });
+                    .json({ reply: "email, message, programID et mode sont requis." });
             }
 
             // Construction du prompt
             const previousSummary: string = await getStudentSummary(email);
-            const systemPrompt: string = await getSystemPrompt(args, email, programID, previousSummary);
+            const systemPrompt: string = await getSystemPrompt(args, email, programID, previousSummary, mode);
 
             // OpenAI
             const reply = await args.openai.responses.create({
@@ -53,9 +53,18 @@ export default function createChatRouter(args: any): express.Router {
     return router;
 }
 
-async function getSystemPrompt(args: any, email: string, programID: string, summary: string): Promise<string> {
+async function getSystemPrompt(args: any, email: string, programID: string, summary: string, mode: string): Promise<string> {
     const program_context: string = await getProgramPrompt(programID);
 
+    // Mode discussion libre
+    if( mode === "free" ) {
+        return `Tu es un assistant pédagogique en mode discussion libre.
+                Tu peux répondre à toutes les questions de l'étudiant, même si elles sortent du cadre du programme.
+                Voici les informations sur le résumé de ses interactions précédentes avec toi :
+                ${summary || "- Aucun historique significatif pour l'instant."}`;
+    }
+
+    // Mode mentor
     return render(args.mentorSystemTemplate, {
         "email": email,
         "school_name": args.mentorConfig.school_name,
