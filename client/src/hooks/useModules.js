@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { apiFetch } from "../utils/api";
 import { buildInitMessage, createMessage } from "../utils/messageFormatter";
 
-const PROGRAM_ID = "A1";
+const PROGRAM_ID = "A1"; // Identifiant du programme à utiliser
 
 const DEFAULT_MESSAGES = [
     createMessage(

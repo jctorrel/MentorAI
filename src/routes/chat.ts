@@ -34,6 +34,7 @@ export default function createChatRouter(args: any): express.Router {
                 input: message
             });
             const mentorReply: string = reply.output_text.trim();
+            console.log("Réponse du mentor :", mentorReply);
 
             // Réponse du mentor
             res.json({ mentorReply });
@@ -41,7 +42,7 @@ export default function createChatRouter(args: any): express.Router {
             // Création du résumé
             await createStudentSummary(args.summarySystemTemplate, email, message, mentorReply);
         } catch (err) {
-            logger.error("❌ Erreur /api/chat :", err);
+            logger.error("Erreur /api/chat :", err);
 
             return res.status(500).json({
                 reply:
@@ -54,7 +55,7 @@ export default function createChatRouter(args: any): express.Router {
 }
 
 async function getSystemPrompt(args: any, email: string, programID: string, summary: string): Promise<string> {
-    const program_context: string = await getProgramPrompt(args.programs, programID);
+    const program_context: string = await getProgramPrompt(programID);
 
     return render(args.mentorSystemTemplate, {
         "email": email,

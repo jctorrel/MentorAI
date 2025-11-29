@@ -4,6 +4,7 @@ import { logger } from "../utils/logger";
 import { getActiveModules } from "../utils/programs";
 import type { ProgramModule, Programs } from "../utils/programs";
 import { AuthRequest } from "../middleware/authMiddleware";
+import { getProgram } from "../db/programs";
 
 export default function createInitRouter(programs: Programs): express.Router {
     const router = express.Router();
@@ -16,7 +17,13 @@ export default function createInitRouter(programs: Programs): express.Router {
                 .status(400)
                 .json({ reply: "programID est requis." });
         }
-        const modules: ProgramModule[] = getActiveModules(programs, programID);
+        const program = await getProgram(programID);
+        if (!program) {
+            return res
+                .status(404)
+                .json({ reply: "Programme introuvable." });
+        }
+        const modules: ProgramModule[] = await getActiveModules(program);
 
         // Si ok => 200, sinon => 500
         try {

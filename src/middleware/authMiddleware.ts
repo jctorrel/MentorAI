@@ -37,7 +37,6 @@ export function requireAuth(
     req.user = decoded;
     return next();
   } catch (error: any) {
-    logger.error("JWT verification failed:", error);
     if (error.name === "TokenExpiredError") {
       return res.status(401).json({ error: "token_expired" });
     }

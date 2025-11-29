@@ -1,4 +1,5 @@
 // src/db/programs.ts
+import { logger } from "../utils/logger";
 import { getDb } from "./db";
 
 export interface Program {
@@ -59,6 +60,7 @@ export async function upsertProgram(id: string, data: any): Promise<Program> {
   );
 
   if (!result || !result.value) {
+    logger.error("Échec upsertProgram() pour l'id :", id);
     throw new Error("Échec upsertProgram()");
   }
 

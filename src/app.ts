@@ -40,19 +40,19 @@ export default async function buildApp(): Promise<express.Express> {
   const summarySystemTemplate: string | null = await getPromptContent(summaryPromptTemplate);
 
   if (!mentorConfig) {
-    logger.error("❌ Config introuvable");
+    logger.error("Config introuvable");
     throw new Error("Config introuvable");
   }
   if (!programs) {
-    logger.error("❌ Programs introuvables");
+    logger.error("Programs introuvables");
     throw new Error("Programs introuvables");
   }
   if (!mentorSystemTemplate) {
-    logger.error(`❌ Prompt mentor introuvable pour la clé : ${mentorPromptTemplate}`);
+    logger.error(`Prompt mentor introuvable pour la clé : ${mentorPromptTemplate}`);
     throw new Error(`Prompt mentor introuvable pour la clé : ${mentorPromptTemplate}`);
   }
   if (!summarySystemTemplate) {
-    logger.error(`❌ Prompt mentor introuvable pour la clé : ${mentorPromptTemplate}`);
+    logger.error(`Prompt summary introuvable pour la clé : ${summaryPromptTemplate}`);
     throw new Error(`Prompt summary introuvable pour la clé : ${summaryPromptTemplate}`);
   }
 
