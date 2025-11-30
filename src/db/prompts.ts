@@ -53,8 +53,6 @@ export async function upsertPrompt(
     .collection<PromptDoc>("prompts")
     .findOneAndUpdate({ key }, update, { upsert: true, returnDocument: "after" });
 
-    console.log("Upsert prompt result:", result);
-
   if (result && !result.key) {
     throw new Error("Impossible de créer/mettre à jour le prompt");
   }

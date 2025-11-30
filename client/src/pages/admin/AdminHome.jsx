@@ -8,6 +8,7 @@ import AdminSection from "../../components/admin/AdminSection";
 import ConfigForm from "../../components/admin/ConfigForm";
 import AdminPromptsSection from "./AdminPromptsSection";
 import AdminProgramsSection from "./AdminProgramsSection";
+import AdminFreeModeSection from "../../components/admin/AdminFreeModeSection";
 import { LoadingState, AccessDenied } from "../../components/admin/AdminStatus";
 
 function AdminHome() {
@@ -49,6 +50,11 @@ function AdminHome() {
                             onFieldChange={updateField}
                             onSave={saveConfig}
                         />
+
+                        {/* Section Mode Libre */}
+                        <AdminSection title="Interface Étudiants">
+                            <AdminFreeModeSection />
+                        </AdminSection>
 
                         <AdminSection title="Prompts">
                             <AdminPromptsSection />

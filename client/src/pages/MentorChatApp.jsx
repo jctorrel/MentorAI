@@ -11,6 +11,7 @@ import QuickActions from "../components/QuickActions.jsx";
 import { useBackendHealth } from "../hooks/useBackendHealth";
 import { useChatSession } from "../hooks/useChatSession";
 import { useModules } from "../hooks/useModules";
+import { useAdminSettings } from "../hooks/useAdminSettings";
 import { getCurrentUserEmail } from "../utils/storage";
 
 function MentorChatApp() {
@@ -18,6 +19,9 @@ function MentorChatApp() {
     const [inputValue, setInputValue] = useState("");
     const [activeMode, setActiveMode] = useState("guided"); // "guided" ou "free"
     const [shouldShowModules, setShouldShowModules] = useState(true);
+
+    // Hook pour les paramètres d'administration
+    const { settings } = useAdminSettings();
 
     // Hook pour surveiller l'état du backend
     const { online: backendOnline, statusLabel: backendStatusLabel } = useBackendHealth();
@@ -92,22 +96,25 @@ function MentorChatApp() {
                     backendStatusLabel={backendStatusLabel}
                 />
 
-                <TabBar 
-                    activeMode={activeMode}
-                    onModeChange={handleModeChange}
-                />
+                {/* Afficher TabBar uniquement si le mode libre est activé */}
+                {settings.freeModeEnabled && (
+                    <TabBar 
+                        activeMode={activeMode}
+                        onModeChange={handleModeChange}
+                    />
+                )}
 
                 <div className="grid grid-rows-[auto_1fr_auto] gap-2 flex-1 min-h-0">
                     <HelperBar 
                         studentEmail={studentEmail}
-                        mode={activeMode}
+                        mode={settings.freeModeEnabled ? activeMode : "guided"}
                     />
 
                     <ChatWindow messages={messages} isTyping={isTyping} />
 
                     <div>
                         {/* Afficher les QuickActions uniquement en mode guidé ET si shouldShowModules est true */}
-                        {activeMode === "guided" && shouldShowModules && (
+                        {(!settings.freeModeEnabled || activeMode === "guided") && shouldShowModules && (
                             <QuickActions
                                 modules={modules}
                                 onModuleClick={handleModuleClick}
@@ -120,7 +127,7 @@ function MentorChatApp() {
                             onSubmit={handleSubmit}
                             disabled={isLoading}
                             placeholder={
-                                activeMode === "free" 
+                                settings.freeModeEnabled && activeMode === "free" 
                                     ? "Posez n'importe quelle question..." 
                                     : "Tapez votre message..."
                             }
