@@ -13,10 +13,10 @@ function ProgramsList({ programs, selectedId, onSelect, onCreate }) {
                 <ul style={styles.list}>
                     {programs.map((program) => (
                         <ProgramItem
-                            key={program.id}
+                            key={program.key}
                             program={program}
-                            isActive={program.id === selectedId}
-                            onClick={() => onSelect(program.id)}
+                            isActive={program.key === selectedId}
+                            onClick={() => onSelect(program.key)}
                         />
                     ))}
                 </ul>
@@ -33,7 +33,7 @@ function ProgramItem({ program, isActive, onClick }) {
 
     return (
         <li style={itemStyle} onClick={onClick}>
-            {program.id} – {program.label || "(sans label)"}
+            {program.key} - {program.label || "(sans label)"}
         </li>
     );
 }

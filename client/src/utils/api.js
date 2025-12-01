@@ -2,7 +2,7 @@
 export async function apiFetch(url, options = {}) {
   const token = localStorage.getItem("access_token");
 
-  // 👉 Si pas de token, on ne contacte même pas le backend
+  // 👉 Si pas de token, on ne contacte pas le backend
   if (!token) {
     console.warn("Aucun token trouvé, redirection vers /login");
     window.location.href = "/login";

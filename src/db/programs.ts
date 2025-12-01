@@ -3,7 +3,7 @@ import { logger } from "../utils/logger";
 import { getDb } from "./db";
 
 export interface Program {
-  id: string;          // "A1", "B2", etc.
+  key: string;          // "A1", "B2", etc.
   label: string;
   objectives: string;
   level: string;
@@ -26,51 +26,64 @@ const COLLECTION = "programs";
  */
 export async function listPrograms(): Promise<Program[]> {
   const db = getDb();
-  return db.collection<Program>(COLLECTION).find().sort({ id: 1 }).toArray();
+  return db.collection<Program>(COLLECTION).find().sort({ key: 1 }).toArray();
 }
 
 /**
  * Récupérer un programme par id
  */
-export async function getProgram(id: string): Promise<Program | null> {
+export async function getProgram(key: string): Promise<Program | null> {
   const db = getDb();
-  return db.collection<Program>(COLLECTION).findOne({ id });
+  return db.collection<Program>(COLLECTION).findOne({ key });
 }
 
 /**
  * Mettre à jour ou créer un programme
  */
-export async function upsertProgram(id: string, data: any): Promise<Program> {
+export async function upsertProgram(key: string, data: Partial<Program>): Promise<Program> {
   const db = getDb();
   const now = new Date();
 
-  const result = await db.collection(COLLECTION).findOneAndUpdate(
-    { id },
-    {
-      $set: {
-        id,
-        ...data,
-        updatedAt: now,
-      },
-      $setOnInsert: {
-        createdAt: now,
-      },
-    },
-    { upsert: true, returnDocument: "after" }
-  );
+  const { label, objectives, level, resources, modules } = data;
 
-  if (!result || !result.value) {
-    logger.error("Échec upsertProgram() pour l'id :", id);
+  const update = {
+    $set: {
+      key,
+      label,
+      objectives,
+      level,
+      resources,
+      modules,
+      updatedAt: now,
+    },
+    $setOnInsert: {
+      createdAt: now,
+    },
+  };
+  
+  const result = await db
+    .collection<Program>(COLLECTION)
+    .findOneAndUpdate(
+      { key }, 
+      update, 
+      { 
+        upsert: true, 
+        returnDocument: "after" 
+      }
+    );
+
+  if (!result || !result.key) {
+    logger.error("Échec upsertProgram() pour la clé :", key);
     throw new Error("Échec upsertProgram()");
   }
 
-  return result.value;
+  return result;
 }
 
 /**
  * Supprimer un programme
  */
-export async function deleteProgram(id: string): Promise<void> {
+export async function deleteProgram(key: string): Promise<void> {
   const db = getDb();
-  await db.collection(COLLECTION).deleteOne({ id });
+  await db.collection(COLLECTION).deleteOne({ key });
 }

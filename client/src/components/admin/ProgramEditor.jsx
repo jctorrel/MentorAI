@@ -28,14 +28,14 @@ function ProgramEditor({
 
     const handleDelete = () => {
         if (window.confirm("Supprimer ce programme ?")) {
-            onDelete(selectedProgram.id);
+            onDelete(selectedProgram.key);
         }
     };
 
     return (
         <div style={styles.editor}>
             <h3 style={styles.editorTitle}>
-                Programme : <code>{selectedProgram.id}</code>
+                Programme : <code>{selectedProgram.key}</code>
             </h3>
 
             <ErrorMessage message={error} />
@@ -47,7 +47,7 @@ function ProgramEditor({
                     onChange={(e) => onJsonChange(e.target.value)}
                     style={styles.textarea}
                     rows={20}
-                    placeholder='{"id": "A1", "label": "Programme A1", ...}'
+                    placeholder='{"key": "A1", "label": "Programme A1", ...}'
                     spellCheck={false}
                 />
 

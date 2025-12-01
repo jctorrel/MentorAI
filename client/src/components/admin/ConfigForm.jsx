@@ -1,7 +1,41 @@
 // src/components/admin/ConfigForm.jsx
+import { useState, useEffect } from 'react';
 import { ErrorMessage, SuccessMessage } from "./AdminStatus";
+import { apiFetch } from "../../utils/api";
 
 function ConfigForm({ config, saving, saveMessage, error, onFieldChange, onSave }) {
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
+
+    // Charger la configuration au montage du composant
+    useEffect(() => {
+        const loadConfig = async () => {
+            setLoading(true);
+            setLoadError(null);
+            
+            try {
+                const data = await apiFetch('/api/admin/config', {method: 'GET'});
+
+                if (!data) {
+                    throw new Error(`Erreur HTTP: ${data.status}`);
+                }
+
+                Object.keys(data).forEach(key => {
+                    if (data[key] !== undefined) {
+                        onFieldChange(key, data[key]);
+                    }
+                });
+            } catch (err) {
+                console.error('Erreur lors du chargement de la configuration:', err);
+                setLoadError(err.message || 'Impossible de charger la configuration');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadConfig();
+    }, []); // Se lance une seule fois au montage
+
     const handleSubmit = (e) => {
         e.preventDefault();
         onSave();
@@ -12,13 +46,37 @@ function ConfigForm({ config, saving, saveMessage, error, onFieldChange, onSave 
         onFieldChange(name, value);
     };
 
+    // Afficher un loader pendant le chargement
+    if (loading) {
+        return (
+            <section style={styles.section}>
+                <h2 style={styles.sectionTitle}>Configuration générale</h2>
+                <div style={styles.loader}>
+                    <p>Chargement de la configuration...</p>
+                </div>
+            </section>
+        );
+    }
+
     return (
         <section style={styles.section}>
             <h2 style={styles.sectionTitle}>Configuration générale</h2>
             <p style={styles.sectionHelp}>
-                Paramètres globaux utilisés par le mentor (nom de l'école,
-                tonalité des réponses, règles de sécurité…).
+                Paramètres globaux utilisés par le mentor.
             </p>
+
+            {/* Afficher l'erreur de chargement si elle existe */}
+            {loadError && (
+                <div style={styles.loadError}>
+                    ⚠️ Erreur de chargement : {loadError}
+                    <button 
+                        onClick={() => window.location.reload()} 
+                        style={styles.reloadButton}
+                    >
+                        Recharger
+                    </button>
+                </div>
+            )}
 
             <ErrorMessage message={error} />
 
@@ -31,7 +89,7 @@ function ConfigForm({ config, saving, saveMessage, error, onFieldChange, onSave 
                         id="school_name"
                         name="school_name"
                         type="text"
-                        value={config.school_name}
+                        value={config.school_name || ''}
                         onChange={handleChange}
                         style={styles.input}
                         placeholder="Normandie Web School"
@@ -46,7 +104,7 @@ function ConfigForm({ config, saving, saveMessage, error, onFieldChange, onSave 
                         id="tone"
                         name="tone"
                         type="text"
-                        value={config.tone}
+                        value={config.tone || ''}
                         onChange={handleChange}
                         style={styles.input}
                         placeholder="concis, professionnel, bienveillant…"
@@ -63,7 +121,7 @@ function ConfigForm({ config, saving, saveMessage, error, onFieldChange, onSave 
                     <textarea
                         id="rules"
                         name="rules"
-                        value={config.rules}
+                        value={config.rules || ''}
                         onChange={handleChange}
                         style={styles.textarea}
                         rows={4}
@@ -77,7 +135,11 @@ function ConfigForm({ config, saving, saveMessage, error, onFieldChange, onSave 
                 <div style={styles.actions}>
                     <button
                         type="submit"
-                        style={styles.buttonPrimary}
+                        style={{
+                            ...styles.buttonPrimary,
+                            opacity: saving ? 0.6 : 1,
+                            cursor: saving ? 'not-allowed' : 'pointer',
+                        }}
                         disabled={saving}
                     >
                         {saving ? "Sauvegarde…" : "Sauvegarder la config"}
@@ -158,6 +220,31 @@ const styles = {
         fontWeight: 500,
         cursor: "pointer",
         transition: "background-color 0.2s",
+    },
+    loader: {
+        padding: "2rem",
+        textAlign: "center",
+        color: "#6b7280",
+    },
+    loadError: {
+        backgroundColor: "#fef2f2",
+        border: "1px solid #fecaca",
+        borderRadius: "0.75rem",
+        padding: "1rem",
+        marginBottom: "1rem",
+        color: "#991b1b",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+    },
+    reloadButton: {
+        padding: "0.25rem 0.75rem",
+        borderRadius: "0.5rem",
+        border: "1px solid #fecaca",
+        backgroundColor: "white",
+        color: "#991b1b",
+        fontSize: "0.85rem",
+        cursor: "pointer",
     },
 };
 

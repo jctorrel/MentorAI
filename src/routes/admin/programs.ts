@@ -22,47 +22,47 @@ export default function createProgramsRouter(): express.Router {
     }
   });
 
-  // GET /api/admin/programs/:id
-  router.get("/:id", async (req, res) => {
+  // GET /api/admin/programs/:key
+  router.get("/:key", async (req, res) => {
     try {
-      const id = req.params.id;
-      const program = await getProgram(id);
+      const key = req.params.key;
+      const program = await getProgram(key);
       if (!program) {
         return res.status(404).json({ error: "not_found" });
       }
       res.json(program);
     } catch (err) {
-      logger.error("Erreur GET /api/admin/programs/:id :", err);
+      logger.error("Erreur GET /api/admin/programs/:key :", err);
       res.status(500).json({ error: "internal_error" });
     }
   });
 
-  // PUT /api/admin/programs/:id
-  router.put("/:id", async (req, res) => {
+  // PUT /api/admin/programs/:key
+  router.put("/:key", async (req, res) => {
     try {
-      const id = req.params.id;
+      const key = req.params.key;
       const body = req.body;
 
       if (typeof body !== "object" || !body) {
         return res.status(400).json({ error: "invalid_json" });
       }
 
-      const updated = await upsertProgram(id, body);
+      const updated = await upsertProgram(key, body);
       res.json(updated);
     } catch (err) {
-      logger.error("Erreur PUT /api/admin/programs/:id :", err);
+      logger.error("Erreur PUT /api/admin/programs/:key :", err);
       res.status(500).json({ error: "internal_error" });
     }
   });
 
-  // DELETE /api/admin/programs/:id
-  router.delete("/:id", async (req, res) => {
+  // DELETE /api/admin/programs/:key
+  router.delete("/:key", async (req, res) => {
     try {
-      const id = req.params.id;
-      await deleteProgram(id);
+      const key = req.params.key;
+      await deleteProgram(key);
       res.json({ ok: true });
     } catch (err) {
-      logger.error("Erreur DELETE /api/admin/programs/:id :", err);
+      logger.error("Erreur DELETE /api/admin/programs/:key :", err);
       res.status(500).json({ error: "internal_error" });
     }
   });

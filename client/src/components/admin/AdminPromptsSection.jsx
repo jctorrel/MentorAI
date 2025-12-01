@@ -5,7 +5,6 @@ import { apiFetch } from "../../utils/api";
 function AdminPromptsSection() {
   const [prompts, setPrompts] = useState([]);
   const [loadingList, setLoadingList] = useState(true);
-  const [loadingPrompt, setLoadingPrompt] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [saveMessage, setSaveMessage] = useState("");
@@ -56,7 +55,7 @@ function AdminPromptsSection() {
     setSaveMessage("");
     setSelectedKey(key);
 
-    const found = (list || prompts).find((p) => p.key === key);
+    const found = list.find((p) => p.key === key);
     if (found) {
       setForm({
         key: found.key,
@@ -216,7 +215,7 @@ function AdminPromptsSection() {
                     spellCheck={false}
                   />
                   <p style={styles.fieldHint}>
-                    Utilisez la syntaxe  pour insérer des variables dynamiques.
+                    Utilisez la syntaxe {{variable}} pour insérer des variables dynamiques.
                   </p>
                 </div>
 

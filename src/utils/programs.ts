@@ -14,6 +14,7 @@ export type ProgramModule = {
 };
 
 export type Program = {
+  key: string;
   objectives: string;
   level: string;
   label: string;

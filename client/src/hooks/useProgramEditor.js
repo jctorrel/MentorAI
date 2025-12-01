@@ -50,7 +50,7 @@ export function useProgramEditor(selectedProgram, onSave) {
      * Valide le JSON
      */
     const validateJson = () => {
-        if (!selectedProgram?.id) {
+        if (!selectedProgram?.key) {
             setError("Aucun programme sélectionné");
             return null;
         }
@@ -76,7 +76,7 @@ export function useProgramEditor(selectedProgram, onSave) {
         setSaveMessage("");
 
         try {
-            await apiFetch(`/api/admin/programs/${selectedProgram.id}`, {
+            await apiFetch(`/api/admin/programs/${selectedProgram.key}`, {
                 method: "PUT",
                 body: JSON.stringify(parsed),
             });

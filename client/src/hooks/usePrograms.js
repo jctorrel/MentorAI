@@ -49,8 +49,8 @@ export function usePrograms() {
     /**
      * Sélectionne un programme par son ID
      */
-    const selectProgram = (id) => {
-        const program = state.programs.find((p) => p.id === id);
+    const selectProgram = (key) => {
+        const program = state.programs.find((p) => p.key === key);
         if (program) {
             setState(prev => ({
                 ...prev,
@@ -62,16 +62,16 @@ export function usePrograms() {
     /**
      * Crée un nouveau programme
      */
-    const createProgram = async (id) => {
-        if (!id || !id.trim()) {
+    const createProgram = async (key) => {
+        if (!key || !key.trim()) {
             throw new Error("L'ID du programme est requis");
         }
 
         try {
-            await apiFetch(`/api/admin/programs/${id}`, {
+            await apiFetch(`/api/admin/programs/${key}`, {
                 method: "PUT",
                 body: JSON.stringify({
-                    id,
+                    key,
                     label: "",
                     objectives: "",
                     level: "",
@@ -82,7 +82,7 @@ export function usePrograms() {
 
             // Recharger la liste et sélectionner le nouveau programme
             await loadPrograms();
-            selectProgram(id);
+            selectProgram(key);
         } catch (error) {
             throw new Error(
                 error?.message || "Impossible de créer le programme"
@@ -93,13 +93,13 @@ export function usePrograms() {
     /**
      * Supprime un programme
      */
-    const deleteProgram = async (id) => {
-        if (!id) {
+    const deleteProgram = async (key) => {
+        if (!key) {
             throw new Error("Aucun programme sélectionné");
         }
 
         try {
-            await apiFetch(`/api/admin/programs/${id}`, {
+            await apiFetch(`/api/admin/programs/${key}`, {
                 method: "DELETE",
             });
 
