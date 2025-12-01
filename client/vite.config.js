@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],  
   test: {
     environment: 'jsdom',
-    setupFiles: './tests/setupTests.js'
+    setupFiles: './vitest.setup.js'
   },
   server: {
     port: 5173,

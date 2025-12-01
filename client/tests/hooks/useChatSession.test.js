@@ -77,6 +77,7 @@ describe('useChatSession', () => {
                 email: mockEmail,
                 message: 'Hello mentor',
                 programID: 'A1',
+                mode: 'guided'
             }),
         });
     });
