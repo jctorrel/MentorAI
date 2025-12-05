@@ -90,7 +90,7 @@ function MentorChatApp() {
 
     return (
         <div className="flex justify-center items-stretch min-h-screen p-4 md:p-[18px]">
-            <div className="w-full max-w-[1120px] bg-white rounded-3xl p-4 md:p-[18px] shadow-soft border border-gray-100 flex flex-col gap-2.5">
+            <div className="w-full max-w-[80%] bg-white rounded-3xl p-4 md:p-[18px] shadow-soft border border-gray-100 flex flex-col gap-2.5">
                 <Header
                     online={online}
                     count={count}
@@ -127,6 +127,7 @@ function MentorChatApp() {
                             onChange={setInputValue}
                             onSubmit={handleSubmit}
                             disabled={isLoading}
+                            shouldShowModules={shouldShowModules}
                             placeholder={
                                 settings.freeModeEnabled && activeMode === "free"
                                     ? "Posez n'importe quelle question..."

@@ -17,9 +17,10 @@ const MONTHS = [
 ];
 
 const INIT_MESSAGE =
-    "Bonjour 👋\n" +
-    "Je suis ton mentor pédagogique numérique. Voici les modules disponibles pour cette session, " +
-    "sur quoi souhaites-tu travailler ?\n";
+    "Bonjour 👋\n\n" +
+    "Je suis le mentor pédagogique de la Normandie Web School. \n\n " +
+    "Sur quoi souhaites-tu travailler ? \n\n" +
+    "# **_↓↓ Utilise la barre de navigation pour choisir l'un des modules disponibles↓↓_**";
 
 const DEFAULT_WELCOME_MESSAGE =
     "Bonjour 👋\n" +
@@ -33,21 +34,9 @@ const DEFAULT_WELCOME_MESSAGE =
  * @returns {string} Message formaté avec la liste des modules
  */
 export function buildInitMessage(modules) {
-    if (!Array.isArray(modules) || modules.length === 0) {
-        return DEFAULT_WELCOME_MESSAGE;
-    }
-
-    const bulletList = modules
-        .map((module) => {
-            const label = module.label || "Module sans nom";
-            const content = (module.content || []).join(", ");
-            const monthName = MONTHS[module.end_month] || "une date inconnue";
-
-            return `• **${label}** (_À faire avant fin ${monthName}_) \n ${content}`;
-        })
-        .join("\n\n");
-
-    return `${INIT_MESSAGE}\n\n${bulletList}`;
+    if (modules && modules.length > 0)
+        return INIT_MESSAGE;
+    else return DEFAULT_WELCOME_MESSAGE;
 }
 
 /**

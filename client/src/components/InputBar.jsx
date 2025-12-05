@@ -1,7 +1,10 @@
 // client/src/components/InputBar.jsx
 import React from "react";
 
-function InputBar({ value, onChange, onSubmit, disabled, placeholder = "Tapez votre message..." }) {
+function InputBar({ value, onChange, onSubmit, disabled, shouldShowModules, placeholder = "Tapez votre message..." }) {
+    if (shouldShowModules) {
+        return null;
+    }
     return (
         <form
             onSubmit={onSubmit}
