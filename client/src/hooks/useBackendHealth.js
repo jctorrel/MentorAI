@@ -1,15 +1,10 @@
 // src/hooks/useBackendHealth.js
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { apiFetch } from "../utils/api";
 
-/**
- * Hook personnalisé pour surveiller l'état du backend
- * @returns {Object} État de connexion au backend
- */
 export function useBackendHealth(studentEmail) {
     const [state, setState] = useState({
         online: false,
-        statusLabel: "Vérification...",
         count: 0,
         limit: 0,
     });
@@ -19,14 +14,16 @@ export function useBackendHealth(studentEmail) {
 
         async function checkBackendStatus() {
             try {
-                const data = await apiFetch("/api/health", { method: "POST", body: JSON.stringify({ email: studentEmail }) });
+                const data = await apiFetch("/api/health", { 
+                    method: "POST", 
+                    body: JSON.stringify({ email: studentEmail }) 
+                });
 
                 if (!isMounted) return;
 
                 if (!data?.ok) {
                     setState({
                         online: false,
-                        statusLabel: "Hors ligne (erreur serveur)",
                         count: 0,
                         limit: 0,
                     });
@@ -35,7 +32,6 @@ export function useBackendHealth(studentEmail) {
 
                 setState({
                     online: true,
-                    statusLabel: "En ligne",
                     count: data.count,
                     limit: data.limit,
                 });
@@ -44,22 +40,18 @@ export function useBackendHealth(studentEmail) {
 
                 setState({
                     online: false,
-                    statusLabel: "Hors ligne (serveur injoignable)",
                     count: 0,
                     limit: 0,
                 });
             }
         }
 
-        // Vérification initiale
         checkBackendStatus();
 
-        // Écouter les événements online/offline du navigateur
         const handleOnline = () => checkBackendStatus();
         const handleOffline = () => {
             setState({
                 online: false,
-                statusLabel: "Hors ligne",
                 count: 0,
                 limit: 0,
             });
@@ -73,7 +65,14 @@ export function useBackendHealth(studentEmail) {
             window.removeEventListener("online", handleOnline);
             window.removeEventListener("offline", handleOffline);
         };
+    }, [studentEmail]);
+
+    const incrementCount = useCallback(() => {
+        setState(prev => ({
+            ...prev,
+            count: prev.count + 1
+        }));
     }, []);
 
-    return state;
-}
+    return { ...state, incrementCount };
+}   

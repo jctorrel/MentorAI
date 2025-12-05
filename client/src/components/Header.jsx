@@ -2,7 +2,7 @@
 import React from "react";
 import StatusBadge from "./StatusBadge";
 
-function Header({ backendOnline, backendStatusLabel, count, limit }) {
+function Header({ online, count, limit }) {
     return (
         <header className="relative flex items-center gap-3.5 px-3 py-2.5 rounded-[20px] overflow-hidden bg-gradient-to-br from-nws-yellow/14 via-nws-teal/12 to-nws-purple/16 border border-indigo-300/26">
             {/* Barre colorée en bas */}
@@ -27,8 +27,7 @@ function Header({ backendOnline, backendStatusLabel, count, limit }) {
 
             {/* Badge statut (caché sur mobile) */}
             <StatusBadge
-                backendOnline={backendOnline}
-                backendStatusLabel={backendStatusLabel}
+                online={online}
                 count={count}
                 limit={limit}
             />

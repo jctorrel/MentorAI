@@ -24,7 +24,7 @@ function MentorChatApp() {
     const { settings } = useAdminSettings();
 
     // Hook pour surveiller l'état du backend
-    const { online: backendOnline, statusLabel: backendStatusLabel, count: count, limit: limit } = useBackendHealth(studentEmail);
+    const { online, count, limit, incrementCount } = useBackendHealth(studentEmail);
 
     // Hook pour gérer la session de chat
     const {
@@ -34,7 +34,7 @@ function MentorChatApp() {
         error,
         handleUserMessage,
         setInitialMessages,
-    } = useChatSession(studentEmail);
+    } = useChatSession(studentEmail, [], incrementCount);
 
     // Hook pour gérer les modules avec callback d'initialisation
     const handleModulesInitialized = useCallback(
@@ -92,8 +92,7 @@ function MentorChatApp() {
         <div className="flex justify-center items-stretch min-h-screen p-4 md:p-[18px]">
             <div className="w-full max-w-[1120px] bg-white rounded-3xl p-4 md:p-[18px] shadow-soft border border-gray-100 flex flex-col gap-2.5">
                 <Header
-                    backendOnline={backendOnline}
-                    backendStatusLabel={backendStatusLabel}
+                    online={online}
                     count={count}
                     limit={limit}
                 />

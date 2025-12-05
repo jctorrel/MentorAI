@@ -5,21 +5,12 @@ import { createMessage, getDefaultErrorMessage } from "../utils/messageFormatter
 
 const PROGRAM_ID = "A1";
 
-/**
- * Hook personnalisé pour gérer la session de chat
- * @param {string} studentEmail - Email de l'étudiant
- * @param {Array} initialMessages - Messages initiaux
- * @returns {Object} État et fonctions pour gérer le chat
- */
-export function useChatSession(studentEmail, initialMessages = []) {
+export function useChatSession(studentEmail, initialMessages = [], onMessageSent = null) {
     const [messages, setMessages] = useState(initialMessages);
     const [isTyping, setIsTyping] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
 
-    /**
-     * Ajoute un message utilisateur au chat
-     */
     const addUserMessage = useCallback((text) => {
         setMessages((prev) => [
             ...prev,
@@ -27,9 +18,6 @@ export function useChatSession(studentEmail, initialMessages = []) {
         ]);
     }, []);
 
-    /**
-     * Ajoute un message mentor au chat
-     */
     const addMentorMessage = useCallback((text) => {
         setMessages((prev) => [
             ...prev,
@@ -37,18 +25,10 @@ export function useChatSession(studentEmail, initialMessages = []) {
         ]);
     }, []);
 
-    /**
-     * Remplace tous les messages (pour l'initialisation)
-     */
     const setInitialMessages = useCallback((newMessages) => {
         setMessages(newMessages);
     }, []);
 
-    /**
-     * Envoie un message au backend et récupère la réponse du mentor
-     * @param {string} message - Le message à envoyer
-     * @param {string} mode - Le mode actuel ("guided" ou "free")
-     */
     const sendMessage = useCallback(
         async (message, mode = "guided") => {
             const payload = {
@@ -70,26 +50,25 @@ export function useChatSession(studentEmail, initialMessages = []) {
 
                 const mentorText = data?.mentorReply || getDefaultErrorMessage();
                 addMentorMessage(mentorText);
+                
+                // ⭐ Incrémenter le count après un envoi réussi
+                if (onMessageSent) {
+                    onMessageSent();
+                }
             } catch (err) {
                 console.error("Erreur lors de l'appel à /api/chat", err);
                 setError(
                     "Impossible de contacter le mentor. Vérifie ta connexion ou réessaie plus tard."
                 );
-                // Ajouter un message d'erreur dans le chat
                 addMentorMessage(getDefaultErrorMessage());
             } finally {
                 setIsLoading(false);
                 setIsTyping(false);
             }
         },
-        [studentEmail, addMentorMessage]
+        [studentEmail, addMentorMessage, onMessageSent]
     );
 
-    /**
-     * Gère la soumission d'un message utilisateur
-     * @param {string} text - Le texte du message
-     * @param {string} mode - Le mode actuel ("guided" ou "free")
-     */
     const handleUserMessage = useCallback(
         async (text, mode = "guided") => {
             const trimmedText = text.trim();

@@ -1,5 +1,6 @@
-// client/src/components/ChatWindow.jsx
 import React from "react";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 function ChatWindow({ messages, isTyping }) {
     return (
@@ -53,9 +54,8 @@ function ChatWindow({ messages, isTyping }) {
     );
 }
 
-// Composant pour gérer le contenu avec support basique Markdown
+// Composant avec support Markdown complet
 function MessageContent({ text, sender }) {
-    // Vérification de sécurité
     if (!text) {
         return <span></span>;
     }
@@ -64,48 +64,66 @@ function MessageContent({ text, sender }) {
         return <span>{text}</span>;
     }
 
-    // Support basique pour les liens et le code inline
-    const parts = text.split(/(`[^`]+`|\[([^\]]+)\]\(([^)]+)\))/g);
-
     return (
-        <span>
-            {parts.map((part, i) => {
-                // Ignorer les parties undefined ou vides
-                if (!part) {
-                    return null;
+        <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+                a: function(props) {
+                    return <a href={props.href} target="_blank" rel="noopener noreferrer" className="text-nws-purple no-underline border-b border-nws-purple/30 hover:border-nws-purple/80 transition-colors">{props.children}</a>;
+                },
+                code: function(props) {
+                    const isInline = !props.className;
+                    if (isInline) {
+                        return <code className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-gray-900 border border-indigo-300/50 text-nws-yellow">{props.children}</code>;
+                    }
+                    return <code className="block font-mono text-[11px] p-2 rounded-lg bg-gray-900 border border-indigo-300/50 text-nws-yellow overflow-x-auto my-2">{props.children}</code>;
+                },
+                pre: function(props) {
+                    return <pre className="my-2 rounded-lg overflow-hidden">{props.children}</pre>;
+                },
+                h1: function(props) {
+                    return <h1 className="text-base font-bold text-gray-900 mt-3 mb-2">{props.children}</h1>;
+                },
+                h2: function(props) {
+                    return <h2 className="text-[14px] font-bold text-gray-900 mt-2.5 mb-1.5">{props.children}</h2>;
+                },
+                h3: function(props) {
+                    return <h3 className="text-[13px] font-semibold text-gray-900 mt-2 mb-1">{props.children}</h3>;
+                },
+                ul: function(props) {
+                    return <ul className="list-disc list-inside my-1.5 space-y-0.5">{props.children}</ul>;
+                },
+                ol: function(props) {
+                    return <ol className="list-decimal list-inside my-1.5 space-y-0.5">{props.children}</ol>;
+                },
+                li: function(props) {
+                    return <li className="text-[13px]">{props.children}</li>;
+                },
+                p: function(props) {
+                    return <p className="my-1">{props.children}</p>;
+                },
+                strong: function(props) {
+                    return <strong className="font-semibold text-gray-900">{props.children}</strong>;
+                },
+                em: function(props) {
+                    return <em className="italic">{props.children}</em>;
+                },
+                blockquote: function(props) {
+                    return <blockquote className="border-l-3 border-nws-purple/40 pl-3 my-2 italic text-gray-600">{props.children}</blockquote>;
+                },
+                table: function(props) {
+                    return <div className="overflow-x-auto my-2"><table className="min-w-full border border-gray-200 rounded">{props.children}</table></div>;
+                },
+                th: function(props) {
+                    return <th className="border border-gray-200 px-2 py-1 bg-gray-100 text-left text-[12px] font-semibold">{props.children}</th>;
+                },
+                td: function(props) {
+                    return <td className="border border-gray-200 px-2 py-1 text-[12px]">{props.children}</td>;
                 }
-
-                // Code inline
-                if (part.startsWith("`") && part.endsWith("`")) {
-                    return (
-                        <code
-                            key={i}
-                            className="font-mono text-[9px] px-1 py-0.5 rounded bg-gray-900 border border-indigo-300/50 text-nws-yellow"
-                        >
-                            {part.slice(1, -1)}
-                        </code>
-                    );
-                }
-
-                // Lien Markdown [texte](url)
-                const linkMatch = part.match(/\[([^\]]+)\]\(([^)]+)\)/);
-                if (linkMatch) {
-                    return (
-                        <a
-                            key={i}
-                            href={linkMatch[2]}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-nws-purple no-underline border-b border-nws-purple/30 hover:border-nws-purple/80 transition-colors"
-                        >
-                            {linkMatch[1]}
-                        </a>
-                    );
-                }
-
-                return <span key={i}>{part}</span>;
-            })}
-        </span>
+            }}
+        >
+            {text}
+        </ReactMarkdown>
     );
 }
 
