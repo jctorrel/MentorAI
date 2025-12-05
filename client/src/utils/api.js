@@ -22,14 +22,17 @@ export async function apiFetch(url, options = {}) {
     headers,
   });
 
-  if (res.status === 401) {
-    let data = null;
-    try {
-      data = await res.json();
-    } catch (e) {}
+  let data = null;
+  try {
+    data = await res.json();
+  } catch (e) {
+    throw new Error((data && data.error) || "Erreur API");
+  }
 
+  // Erreur autorisation
+  if (res.status === 401) {
     if (data && data.error === "token_expired") {
-      // 🔥 Token expiré
+      // Token expiré
       localStorage.removeItem("access_token");
       localStorage.removeItem("user");
       window.location.href = "/login";
@@ -39,13 +42,10 @@ export async function apiFetch(url, options = {}) {
     throw new Error((data && data.error) || "Unauthorized");
   }
 
-  if (!res.ok) {
-    let data = null;
-    try {
-      data = await res.json();
-    } catch (e) {}
-    throw new Error((data && data.error) || "Erreur API");
+  // Erreur quota mensuel dépassé
+  if (res.status === 429) {
+    console.error("Quota mensuel dépassé");
   }
 
-  return res.json();
+  return data;
 }

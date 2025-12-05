@@ -7,8 +7,10 @@ import render from "../utils/prompts";
 import { getProgramPrompt } from "../utils/programs";
 import getEnv from "../utils/env";
 import { AuthRequest } from "../middleware/authMiddleware";
+import { incrementAndCheckMonthlyUsage } from "../db/usage";
 
 const MENTOR_MODEL = getEnv("MENTOR_MODEL");
+const monthlyLimit = parseInt(getEnv("STUDENT_MONTHLY_MESSAGE_LIMIT", "100"));
 
 export default function createChatRouter(args: any): express.Router {
     const router = express.Router();
@@ -21,6 +23,18 @@ export default function createChatRouter(args: any): express.Router {
                 return res
                     .status(400)
                     .json({ reply: "email, message, programID et mode sont requis." });
+            }
+
+            const usage = await incrementAndCheckMonthlyUsage(email, monthlyLimit);
+            if (!usage.allowed) {
+                return res.status(429).json({
+                    error: "monthly_quota_exceeded",
+                    message:
+                        "Tu as atteint le nombre maximum d'échanges autorisés pour ce mois.",
+                    limit: usage.limit,
+                    count: usage.count,
+                    period: usage.period,
+                });
             }
 
             // Construction du prompt
@@ -57,7 +71,7 @@ async function getSystemPrompt(args: any, email: string, programID: string, summ
     const program_context: string = await getProgramPrompt(programID);
 
     // Mode discussion libre
-    if( mode === "free" ) {
+    if (mode === "free") {
         return `Tu es un assistant pédagogique en mode discussion libre.
                 Tu peux répondre à toutes les questions de l'étudiant, même si elles sortent du cadre du programme.
                 Voici les informations sur le résumé de ses interactions précédentes avec toi :

@@ -24,7 +24,7 @@ function MentorChatApp() {
     const { settings } = useAdminSettings();
 
     // Hook pour surveiller l'état du backend
-    const { online: backendOnline, statusLabel: backendStatusLabel } = useBackendHealth();
+    const { online: backendOnline, statusLabel: backendStatusLabel, count: count, limit: limit } = useBackendHealth(studentEmail);
 
     // Hook pour gérer la session de chat
     const {
@@ -51,7 +51,7 @@ function MentorChatApp() {
      */
     const handleModeChange = (newMode) => {
         setActiveMode(newMode);
-        
+
         // En mode libre, on cache les modules
         // En mode guidé, on les réaffiche s'ils existent
         if (newMode === "free") {
@@ -79,12 +79,12 @@ function MentorChatApp() {
         if (!text || isLoading) return;
 
         setInputValue("");
-        
+
         // En mode guidé, on masque les modules après envoi
         if (activeMode === "guided") {
             setShouldShowModules(false);
         }
-        
+
         await handleUserMessage(text, activeMode);
     };
 
@@ -94,18 +94,20 @@ function MentorChatApp() {
                 <Header
                     backendOnline={backendOnline}
                     backendStatusLabel={backendStatusLabel}
+                    count={count}
+                    limit={limit}
                 />
 
                 {/* Afficher TabBar uniquement si le mode libre est activé */}
                 {settings.freeModeEnabled && (
-                    <TabBar 
+                    <TabBar
                         activeMode={activeMode}
                         onModeChange={handleModeChange}
                     />
                 )}
 
                 <div className="grid grid-rows-[auto_1fr_auto] gap-2 flex-1 min-h-0">
-                    <HelperBar 
+                    <HelperBar
                         studentEmail={studentEmail}
                         mode={settings.freeModeEnabled ? activeMode : "guided"}
                     />
@@ -120,15 +122,15 @@ function MentorChatApp() {
                                 onModuleClick={handleModuleClick}
                             />
                         )}
-                        
+
                         <InputBar
                             value={inputValue}
                             onChange={setInputValue}
                             onSubmit={handleSubmit}
                             disabled={isLoading}
                             placeholder={
-                                settings.freeModeEnabled && activeMode === "free" 
-                                    ? "Posez n'importe quelle question..." 
+                                settings.freeModeEnabled && activeMode === "free"
+                                    ? "Posez n'importe quelle question..."
                                     : "Tapez votre message..."
                             }
                         />

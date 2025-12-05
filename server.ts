@@ -1,4 +1,6 @@
-import { createServer } from "http";
+import { createServer } from "https";
+import fs from "node:fs";
+import path from "node:path";
 
 import buildApp from "./src/app";
 import { logger } from "./src/utils/logger";
@@ -9,7 +11,17 @@ const port = Number(getEnv("PORT", "4000"));
 
 // Start
 const app = await buildApp();
-const server = createServer(app);
+
+// HTTPs server
+const keyPath = getEnv("SSL_KEY_PATH");
+const certPath = getEnv("SSL_CERT_PATH");
+
+const httpsOptions = {
+    key: fs.readFileSync(keyPath),
+    cert: fs.readFileSync(certPath),
+};
+
+const server = createServer(httpsOptions, app);
 
 // Signaux
 process.on("SIGINT", () => shutdown("SIGINT", server));
@@ -25,5 +37,5 @@ process.on("unhandledRejection", (e) => {
 
 // Listen
 server.listen(port, () => {
-    logger.info(`API démarrée sur http://localhost:${port}`);
+    logger.info(`API démarrée sur https://localhost:${port}`);
 });

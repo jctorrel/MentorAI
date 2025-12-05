@@ -1,16 +1,17 @@
 // client/src/components/Header.jsx
 import React from "react";
+import StatusBadge from "./StatusBadge";
 
-function Header({ backendOnline, backendStatusLabel }) {
+function Header({ backendOnline, backendStatusLabel, count, limit }) {
     return (
         <header className="relative flex items-center gap-3.5 px-3 py-2.5 rounded-[20px] overflow-hidden bg-gradient-to-br from-nws-yellow/14 via-nws-teal/12 to-nws-purple/16 border border-indigo-300/26">
             {/* Barre colorée en bas */}
             <div className="absolute left-0 right-0 bottom-0 h-[3px] bg-gradient-to-r from-nws-yellow via-nws-teal via-nws-purple to-nws-red opacity-90" />
 
             {/* Logo */}
-            <img 
-                src="/logo.svg" 
-                alt="Normandie Web School Logo" 
+            <img
+                src="/logo.svg"
+                alt="Normandie Web School Logo"
                 className="w-[120px] h-auto"
             />
 
@@ -25,16 +26,12 @@ function Header({ backendOnline, backendStatusLabel }) {
             </div>
 
             {/* Badge statut (caché sur mobile) */}
-            <div className="ml-auto hidden sm:flex flex-col items-end gap-1 text-[9px] text-gray-500">
-                <span className="px-2 py-[3px] rounded-full border border-indigo-300/70 bg-white/90 inline-flex items-center gap-1.5 text-gray-600">
-                    <span 
-                        className={`w-2.5 h-2.5 rounded-full ${
-                            backendOnline ? 'bg-green-500' : 'bg-red-500'
-                        }`}
-                    />
-                    {backendStatusLabel}
-                </span>
-            </div>
+            <StatusBadge
+                backendOnline={backendOnline}
+                backendStatusLabel={backendStatusLabel}
+                count={count}
+                limit={limit}
+            />
         </header>
     );
 }

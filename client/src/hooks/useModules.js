@@ -84,7 +84,7 @@ export function useModules(onInitialized) {
     }, [onInitialized]);
 
     /**
-     * Masque les modules (après sélection par exemple)
+     * Masque les modules
      */
     const clearModules = () => {
         setModules([]);

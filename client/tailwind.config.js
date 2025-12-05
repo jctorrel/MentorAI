@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Palette NWS personnalisée
+        // Palette NWS
         nws: {
           yellow: '#ffc72c',
           teal: '#00c7b1',

@@ -6,10 +6,12 @@ import { apiFetch } from "../utils/api";
  * Hook personnalisé pour surveiller l'état du backend
  * @returns {Object} État de connexion au backend
  */
-export function useBackendHealth() {
+export function useBackendHealth(studentEmail) {
     const [state, setState] = useState({
         online: false,
         statusLabel: "Vérification...",
+        count: 0,
+        limit: 0,
     });
 
     useEffect(() => {
@@ -17,7 +19,7 @@ export function useBackendHealth() {
 
         async function checkBackendStatus() {
             try {
-                const data = await apiFetch("/api/health", { method: "GET" });
+                const data = await apiFetch("/api/health", { method: "POST", body: JSON.stringify({ email: studentEmail }) });
 
                 if (!isMounted) return;
 
@@ -25,6 +27,8 @@ export function useBackendHealth() {
                     setState({
                         online: false,
                         statusLabel: "Hors ligne (erreur serveur)",
+                        count: 0,
+                        limit: 0,
                     });
                     return;
                 }
@@ -32,13 +36,17 @@ export function useBackendHealth() {
                 setState({
                     online: true,
                     statusLabel: "En ligne",
+                    count: data.count,
+                    limit: data.limit,
                 });
             } catch (error) {
                 if (!isMounted) return;
-                
+
                 setState({
                     online: false,
                     statusLabel: "Hors ligne (serveur injoignable)",
+                    count: 0,
+                    limit: 0,
                 });
             }
         }
@@ -52,6 +60,8 @@ export function useBackendHealth() {
             setState({
                 online: false,
                 statusLabel: "Hors ligne",
+                count: 0,
+                limit: 0,
             });
         };
 

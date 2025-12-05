@@ -55,7 +55,7 @@ export function useChatSession(studentEmail, initialMessages = []) {
                 email: studentEmail,
                 message,
                 programID: PROGRAM_ID,
-                mode, // Ajouter le mode au payload
+                mode,
             };
 
             try {

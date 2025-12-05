@@ -7,7 +7,6 @@ import createApiRouter from "./routes/index";
 import getEnv from "./utils/env";
 import { logger } from "./utils/logger";
 import { getPromptContent } from "./db/prompts";
-import loadConfig from "./utils/configs";
 import { getMentorConfig } from "./db/config";
 import { listPrograms } from "./db/programs";
 
@@ -23,7 +22,7 @@ export default async function buildApp(): Promise<express.Express> {
   const app = express();
 
   // Middlewares
-  app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+  app.use(cors({ origin: "https://localhost:3000", credentials: true }));
   app.use(express.json());
 
   // DB
