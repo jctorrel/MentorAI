@@ -13,6 +13,7 @@ import { useChatSession } from "../hooks/useChatSession";
 import { useModules } from "../hooks/useModules";
 import { useAdminSettings } from "../hooks/useAdminSettings";
 import { getCurrentUserEmail } from "../utils/storage";
+import { apiFetch } from "../utils/api.js";
 
 function MentorChatApp() {
     const [studentEmail] = useState(getCurrentUserEmail);
@@ -33,6 +34,7 @@ function MentorChatApp() {
         isLoading,
         error,
         handleUserMessage,
+        handleFakeMessage,
         setInitialMessages,
     } = useChatSession(studentEmail, [], incrementCount);
 
@@ -65,9 +67,13 @@ function MentorChatApp() {
      * Gère le clic sur un module dans les QuickActions
      */
     const handleModuleClick = async (module) => {
-        const text = `Je veux travailler sur le module "${module.label}"`;
         setShouldShowModules(false); // Cacher après sélection
-        await handleUserMessage(text, "guided");
+        const data = await apiFetch("/api/program", {
+            method: "POST",
+            body: JSON.stringify({programID: "A1", moduleID: module.id, email: studentEmail}),
+        });
+        
+        handleUserMessage("Bonjour, \n\n J'aimerais travailler sur le module : " + module.label +" (" + data.module + ")");
     };
 
     /**

@@ -39,7 +39,9 @@ export default function createChatRouter(args: any): express.Router {
 
             // Construction du prompt
             const previousSummary: string = await getStudentSummary(email);
-            const systemPrompt: string = await getSystemPrompt(args, email, programID, previousSummary, mode);
+            const systemPrompt: string = await getSystemPrompt(args, email, programID, previousSummary, mode, _req);
+
+            console.log("System Prompt:", systemPrompt);
 
             // OpenAI
             const reply = await args.openai.responses.create({
@@ -50,10 +52,10 @@ export default function createChatRouter(args: any): express.Router {
             const mentorReply: string = reply.output_text.trim();
 
             // Réponse du mentor
-            res.json({ mentorReply });
+            //res.json({ mentorReply });
 
             // Création du résumé
-            await createStudentSummary(args.summarySystemTemplate, email, message, mentorReply);
+            //await createStudentSummary(args.summarySystemTemplate, email, message, mentorReply);
         } catch (err) {
             logger.error("Erreur /api/chat :", err);
 
@@ -67,8 +69,10 @@ export default function createChatRouter(args: any): express.Router {
     return router;
 }
 
-async function getSystemPrompt(args: any, email: string, programID: string, summary: string, mode: string): Promise<string> {
-    const program_context: string = await getProgramPrompt(programID);
+async function getSystemPrompt(args: any, email: string, programID: string, summary: string, mode: string, req: AuthRequest): Promise<string> {
+    const program_context = await getProgramPrompt(programID, req);
+
+    console.log("Program context:", program_context);
 
     // Mode discussion libre
     if (mode === "free") {

@@ -80,6 +80,16 @@ export function useChatSession(studentEmail, initialMessages = [], onMessageSent
         [isLoading, addUserMessage, sendMessage]
     );
 
+    const handleFakeMessage = useCallback(
+        async (text, mode = "guided") => {
+            const trimmedText = text.trim();
+            if (!trimmedText || isLoading) return;
+
+            addUserMessage(trimmedText, mode);
+        },
+        [isLoading, addUserMessage]
+    );
+
     return {
         messages,
         isTyping,
@@ -90,5 +100,6 @@ export function useChatSession(studentEmail, initialMessages = [], onMessageSent
         setInitialMessages,
         sendMessage,
         handleUserMessage,
+        handleFakeMessage
     };
 }

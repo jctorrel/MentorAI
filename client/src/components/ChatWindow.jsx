@@ -156,7 +156,7 @@ function MessageContent({ text, sender }) {
                         return <ul className="my-1 space-y-1 pl-10">{props.children}</ul>;
                     },
                     ol: function(props) {
-                        return <ol className="my-1 space-y-1 pl-5">{props.children}</ol>;
+                        return <ol className="my-1 space-y-1">{props.children}</ol>;
                     },
                     li: function(props) {
                         return <li className="text-[13px] leading-snug">{props.children}</li>;

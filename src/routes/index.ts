@@ -5,6 +5,7 @@ import { logger } from "../utils/logger";
 import createHealthRouter from "./health";
 import createChatRouter from "./chat";
 import createInitRouter from "./init";
+import createProgramRouter from "./program";
 import createAuthRouter from "./auth";
 import createConfigRouter from "./admin/config";
 import createPromptsRouter from "./admin/prompts";
@@ -22,6 +23,7 @@ export default function createApiRouter(args: any): express.Router {
     router.use(requireAuth);
     router.use("/api", createHealthRouter(args.openai));
     router.use("/api", createInitRouter(args.programs));
+    router.use("/api", createProgramRouter(args.programs));
     router.use("/api", createChatRouter(args));
 
     // Routes admin

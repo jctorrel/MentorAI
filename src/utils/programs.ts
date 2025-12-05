@@ -4,6 +4,7 @@ import render from "./prompts";
 import { getPromptContent } from "../db/prompts";
 import getEnv from "./env";
 import { getProgram } from "../db/programs";
+import { AuthRequest } from "../middleware/authMiddleware";
 
 export type ProgramModule = {
   id: string;
@@ -46,34 +47,39 @@ export async function getActiveModules(
   });
 }
 
-export async function getProgramPrompt(
-  programID: string,
-  date: Date = new Date()
-): Promise<string> {
-  const program = await getProgram(programID);
+export async function getProgramPrompt(programID: string, req: AuthRequest, date: Date = new Date()): Promise<string> {
+  if (!req.session.initialized) {
+    const program = await getProgram(programID);
 
-  if (!program || !Array.isArray(program.modules)) {
-    logger.error(`Programme introuvable ou invalide pour l'ID : ${programID}`);
-    return "";
+    if (!program || !Array.isArray(program.modules)) {
+      logger.error(`Programme introuvable ou invalide pour l'ID : ${programID}`);
+      return "";
+    }
+
+    const programSystemTemplate: string | null = await getPromptContent(
+      programsPromptTemplate
+    );
+    const modules: ProgramModule[] = await getActiveModules(program, date);
+
+    if (!programSystemTemplate) {
+      logger.error(`Prompt programme introuvable pour la clé : ${programsPromptTemplate}`);
+      throw new Error(`Prompt programme introuvable pour la clé : ${programsPromptTemplate}`);
+    }
+
+    return render(programSystemTemplate, {
+      program_label: program.label,
+      program_objective: program.objectives,
+      program_level: program.level,
+      program_resources: program.resources.join(", "),
+      program_modules: modules
+        .map((module) => `- ${module.label} : ${module.content.join(", ")}`)
+        .join("\n"),
+    });
+  } else {
+    return !req.session.module ? "" : "Focus : " + moduleToString(req.session.module);
   }
+}
 
-  const programSystemTemplate: string | null = await getPromptContent(
-    programsPromptTemplate
-  );
-  const modules: ProgramModule[] = await getActiveModules(program, date);
-
-  if (!programSystemTemplate) {
-    logger.error(`Prompt programme introuvable pour la clé : ${programsPromptTemplate}`);
-    throw new Error(`Prompt programme introuvable pour la clé : ${programsPromptTemplate}`);
-  }
-
-  return render(programSystemTemplate, {
-    program_label: program.label,
-    program_objective: program.objectives,
-    program_level: program.level,
-    program_resources: program.resources.join(", "),
-    program_modules: modules
-      .map((module) => `- ${module.label} : ${module.content.join(", ")}`)
-      .join("\n"),
-  });
+function moduleToString(module: ProgramModule): string {
+  return `${module.label} (${module.content.map((c, i) => `${c}`).join('\n')})`;
 }

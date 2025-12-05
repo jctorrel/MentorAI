@@ -1,4 +1,5 @@
 import express from "express";
+import session from 'express-session';
 import cors from "cors";
 import OpenAI from "openai";
 
@@ -9,6 +10,16 @@ import { logger } from "./utils/logger";
 import { getPromptContent } from "./db/prompts";
 import { getMentorConfig } from "./db/config";
 import { listPrograms } from "./db/programs";
+import type { ProgramModule } from "./utils/programs";
+
+// Session
+declare module 'express-session' {
+  interface SessionData {
+    studentEmail: string;
+    module: ProgramModule;
+    initialized: boolean;
+  }
+}
 
 // DB
 const mongoUri = getEnv("MONGODB_URI");
@@ -24,6 +35,17 @@ export default async function buildApp(): Promise<express.Express> {
   // Middlewares
   app.use(cors({ origin: "https://localhost:3000", credentials: true }));
   app.use(express.json());
+
+  app.use(session({
+    secret: getEnv("SESSION_SECRET"),
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production', // HTTPS en production
+      httpOnly: true, // Protection XSS
+      maxAge: 1000 * 60 * 60 * 24 // 24 heures
+    }
+  }));
 
   // DB
   await initMongo(mongoUri);
