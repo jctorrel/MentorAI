@@ -29,7 +29,6 @@
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.9.6",
     "remark-gfm": "^4.0.1",
-    "tsc": "^2.0.4",
     "typescript": "^5.9.3"
   },
   "devDependencies": {
