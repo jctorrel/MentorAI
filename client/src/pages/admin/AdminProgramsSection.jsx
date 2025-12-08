@@ -15,30 +15,31 @@ function AdminProgramsSection() {
         selectedProgram,
         selectProgram,
         createProgram,
-        deleteProgram,
+        deleteProgram: deleteProgramFromList,
         refreshPrograms,
     } = usePrograms();
 
     const {
-        jsonText,
         saving,
         saveMessage,
         error: saveError,
-        updateJsonText,
         save,
-    } = useProgramEditor(selectedProgram, refreshPrograms);
+        deleteProgram,
+        clearMessages,
+    } = useProgramEditor(refreshPrograms);
 
     /**
      * Gère la création d'un nouveau programme
      */
     const handleCreate = async () => {
         setActionError(null);
+        clearMessages();
 
-        const id = prompt("ID du nouveau programme (ex: A2, B1…) :");
-        if (!id) return;
+        const key = prompt("Clé du nouveau programme (ex: A2, B1…) :");
+        if (!key) return;
 
         try {
-            await createProgram(id.trim());
+            await createProgram(key.trim());
         } catch (error) {
             setActionError(error.message);
         }
@@ -47,11 +48,13 @@ function AdminProgramsSection() {
     /**
      * Gère la suppression d'un programme
      */
-    const handleDelete = async (programId) => {
+    const handleDelete = async (programKey) => {
         setActionError(null);
 
         try {
-            await deleteProgram(programId);
+            await deleteProgram(programKey);
+            // Après suppression, désélectionner le programme
+            selectProgram(null);
         } catch (error) {
             setActionError(error.message);
         }
@@ -79,33 +82,32 @@ function AdminProgramsSection() {
     // Combiner les erreurs d'action et de sauvegarde
     const displayError = actionError || saveError;
 
+    
+    console.log('selectedProgram dans AdminProgramsSection:', selectedProgram); 
     return (
         <section style={styles.section}>
             <h2 style={styles.title}>Programmes</h2>
             <p style={styles.help}>
-                Sélectionne un programme dans la liste, édite son JSON, puis sauvegarde.
+                Sélectionne un programme dans la liste pour l'éditer.
             </p>
 
             {displayError && <p style={styles.errorText}>{displayError}</p>}
-            {saveMessage && <p style={styles.successText}>{saveMessage}</p>}
 
             <div style={styles.layout}>
                 <ProgramsList
                     programs={programs}
-                    selectedId={selectedProgram?.id}
+                    selectedKey={selectedProgram?.key}
                     onSelect={selectProgram}
                     onCreate={handleCreate}
                 />
 
                 <ProgramEditor
                     selectedProgram={selectedProgram}
-                    jsonText={jsonText}
+                    onSave={save}
+                    onDelete={handleDelete}
                     saving={saving}
                     saveMessage={saveMessage}
                     error={saveError}
-                    onJsonChange={updateJsonText}
-                    onSave={save}
-                    onDelete={handleDelete}
                 />
             </div>
         </section>

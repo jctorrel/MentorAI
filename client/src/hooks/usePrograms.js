@@ -32,8 +32,10 @@ export function usePrograms() {
                 ...prev,
                 programs: list,
                 loading: false,
-                // Sélectionner le premier programme par défaut
-                selectedProgram: list.length > 0 ? list[0] : null,
+                // Conserver la sélection si le programme existe toujours
+                selectedProgram: prev.selectedProgram 
+                    ? list.find(p => p.key === prev.selectedProgram.key) || null
+                    : null,
             }));
         } catch (error) {
             setState(prev => ({
@@ -47,24 +49,30 @@ export function usePrograms() {
     };
 
     /**
-     * Sélectionne un programme par son ID
+     * Sélectionne un programme par sa clé
      */
     const selectProgram = (key) => {
-        const program = state.programs.find((p) => p.key === key);
+    console.log('selectProgram appelé avec key:', key); // ✅ Ajoute ça
+    setState(prev => {
+        console.log('Programs disponibles:', prev.programs); // ✅ Et ça
+        const program = prev.programs.find((p) => p.key === key);
+        console.log('Programme trouvé:', program); // ✅ Et ça
         if (program) {
-            setState(prev => ({
+            return {
                 ...prev,
                 selectedProgram: program,
-            }));
+            };
         }
-    };
+        return prev;
+    });
+};
 
     /**
      * Crée un nouveau programme
      */
     const createProgram = async (key) => {
         if (!key || !key.trim()) {
-            throw new Error("L'ID du programme est requis");
+            throw new Error("La clé du programme est requise");
         }
 
         try {
@@ -73,16 +81,20 @@ export function usePrograms() {
                 body: JSON.stringify({
                     key,
                     label: "",
-                    objectives: "",
-                    level: "",
-                    resources: [],
+                    description: "",
                     modules: [],
                 }),
             });
 
-            // Recharger la liste et sélectionner le nouveau programme
-            await loadPrograms();
-            selectProgram(key);
+            // Recharger la liste
+            const list = await apiFetch("/api/admin/programs");
+            const newProgram = list.find(p => p.key === key);
+            
+            setState(prev => ({
+                ...prev,
+                programs: list,
+                selectedProgram: newProgram || null,
+            }));
         } catch (error) {
             throw new Error(
                 error?.message || "Impossible de créer le programme"
@@ -103,10 +115,9 @@ export function usePrograms() {
                 method: "DELETE",
             });
 
-            // Recharger la liste
+            // Recharger la liste et déselectionner
             await loadPrograms();
             
-            // Déselectionner
             setState(prev => ({
                 ...prev,
                 selectedProgram: null,
@@ -124,10 +135,18 @@ export function usePrograms() {
     const refreshPrograms = async () => {
         try {
             const list = await apiFetch("/api/admin/programs");
-            setState(prev => ({
-                ...prev,
-                programs: list,
-            }));
+            setState(prev => {
+                // Conserver la sélection en retrouvant le programme mis à jour
+                const updatedSelected = prev.selectedProgram
+                    ? list.find(p => p.key === prev.selectedProgram.key)
+                    : null;
+                
+                return {
+                    ...prev,
+                    programs: list,
+                    selectedProgram: updatedSelected,
+                };
+            });
         } catch (error) {
             console.error("Erreur lors du rafraîchissement:", error);
         }

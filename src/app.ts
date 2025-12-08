@@ -30,7 +30,7 @@ export const openai = new OpenAI({ apiKey: getEnv("OPENAI_API_KEY") });
 // Prompts
 const mentorPromptTemplate = getEnv("MENTOR_PROMPT_TEMPLATE");
 const summaryPromptTemplate = getEnv("SUMMARY_PROMPT_TEMPLATE");
-// 
+// Frontend origin for CORS
 const FRONTEND_ORIGIN =
   process.env.NODE_ENV === "production"
     ? process.env.FRONTEND_ORIGIN

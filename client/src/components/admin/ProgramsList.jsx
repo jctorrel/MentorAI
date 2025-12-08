@@ -1,6 +1,6 @@
 // src/components/admin/ProgramsList.jsx
 
-function ProgramsList({ programs, selectedId, onSelect, onCreate }) {
+function ProgramsList({ programs, selectedKey, onSelect, onCreate }) {
     return (
         <div style={styles.sidebar}>
             <button style={styles.createButton} onClick={onCreate}>
@@ -15,8 +15,8 @@ function ProgramsList({ programs, selectedId, onSelect, onCreate }) {
                         <ProgramItem
                             key={program.key}
                             program={program}
-                            isActive={program.key === selectedId}
-                            onClick={() => onSelect(program.key)}
+                            isActive={program.key === selectedKey}
+                            onClick={() => onSelect(program.key)} // ✅ Passer la clé, pas l'objet
                         />
                     ))}
                 </ul>
@@ -33,7 +33,12 @@ function ProgramItem({ program, isActive, onClick }) {
 
     return (
         <li style={itemStyle} onClick={onClick}>
-            {program.key} - {program.label || "(sans label)"}
+            <div style={styles.itemContent}>
+                <span style={styles.programKey}>{program.key}</span>
+                <span style={styles.programLabel}>
+                    {program.label || "(sans nom)"}
+                </span>
+            </div>
         </li>
     );
 }
@@ -49,13 +54,14 @@ const styles = {
     createButton: {
         width: "100%",
         marginBottom: "0.5rem",
-        padding: "0.4rem",
+        padding: "0.5rem",
         background: "#10b981",
         border: "none",
-        borderRadius: "0.4rem",
+        borderRadius: "0.5rem",
         color: "white",
         cursor: "pointer",
         fontWeight: 500,
+        fontSize: "0.9rem",
         transition: "background-color 0.2s",
     },
     list: {
@@ -64,16 +70,33 @@ const styles = {
         padding: 0,
     },
     item: {
-        padding: "0.4rem",
+        padding: "0.6rem",
         borderRadius: "0.5rem",
         cursor: "pointer",
         marginBottom: "0.3rem",
         fontSize: "0.9rem",
-        transition: "background-color 0.15s",
+        transition: "all 0.15s",
+        border: "1px solid transparent",
     },
     activeItem: {
         background: "#e0f2fe",
         fontWeight: 500,
+        border: "1px solid #0ea5e9",
+    },
+    itemContent: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "0.2rem",
+    },
+    programKey: {
+        fontSize: "0.75rem",
+        fontWeight: 600,
+        color: "#0ea5e9",
+        textTransform: "uppercase",
+    },
+    programLabel: {
+        fontSize: "0.85rem",
+        color: "#1e293b",
     },
     emptyText: {
         margin: 0,
