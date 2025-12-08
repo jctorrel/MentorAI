@@ -84,12 +84,10 @@ export default async function buildApp(): Promise<express.Express> {
 
   // ---------- STATIC FRONTEND EN PROD ----------
   const staticDir = path.resolve(__dirname, "../public");
-
-  // On ne sert le frontend que si le dossier existe (build réalisé)
   app.use(express.static(staticDir));
 
   // Routes
-  app.use(createApiRouter({
+  app.use("/api", createApiRouter({
     openai,
     mentorSystemTemplate,
     summarySystemTemplate,
