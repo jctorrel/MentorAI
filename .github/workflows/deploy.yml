@@ -3,7 +3,7 @@ name: Deploy to VPS
 on:
   push:
     branches:
-      - main   # déclenché quand tu pushes/merges sur main
+      - main
 
 jobs:
   deploy:
