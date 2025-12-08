@@ -1,4 +1,4 @@
-import { createServer } from "https";
+import { createServer } from "http";
 import fs from "node:fs";
 
 import buildApp from "./src/app";
@@ -12,17 +12,7 @@ async function main() {
 
     // Start
     const app = await buildApp();
-
-    // HTTPs server
-    const keyPath = getEnv("SSL_KEY_PATH");
-    const certPath = getEnv("SSL_CERT_PATH");
-
-    const httpsOptions = {
-        key: fs.readFileSync(keyPath),
-        cert: fs.readFileSync(certPath),
-    };
-
-    const server = createServer(httpsOptions, app);
+    const server = createServer(app);
 
     // Signaux
     process.on("SIGINT", () => shutdown("SIGINT", server));
