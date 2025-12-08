@@ -32,7 +32,7 @@ export default function createApiRouter(args: any): express.Router {
     router.use("/api/admin/prompts", createPromptsRouter());
     router.use("/api/admin/programs", createProgramsRouter());
 
-    logger.info('✅ API routes initialized.');
+    logger.info('✅ API routes initialisées.');
 
     return router;
 }

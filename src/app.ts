@@ -2,6 +2,7 @@ import express from "express";
 import session from 'express-session';
 import cors from "cors";
 import OpenAI from "openai";
+import path from "node:path";
 
 import { initMongo } from "./db/db";
 import createApiRouter from "./routes/index";
@@ -28,12 +29,14 @@ export const openai = new OpenAI({ apiKey: getEnv("OPENAI_API_KEY") });
 // Prompts
 const mentorPromptTemplate = getEnv("MENTOR_PROMPT_TEMPLATE");
 const summaryPromptTemplate = getEnv("SUMMARY_PROMPT_TEMPLATE");
+// 
+const FRONTEND_ORIGIN = getEnv("FRONTEND_ORIGIN") ?? "https://localhost:3000";
 
 export default async function buildApp(): Promise<express.Express> {
   const app = express();
 
   // Middlewares
-  app.use(cors({ origin: "https://localhost:3000", credentials: true }));
+  app.use(cors({ origin: FRONTEND_ORIGIN, credentials: true }));
   app.use(express.json());
 
   app.use(session({
@@ -87,6 +90,18 @@ export default async function buildApp(): Promise<express.Express> {
     mentorConfig,
     programs
   }));
+
+  // ---------- STATIC FRONTEND EN PROD ----------
+  const staticDir = path.resolve(__dirname, "../public");
+
+  // On ne sert le frontend que si le dossier existe (build réalisé)
+  app.use(express.static(staticDir));
+
+  // Catch-all pour React Router (après les routes API)
+  app.get(/^\/(?!api).*/, (_req, res) => {
+    res.sendFile(path.join(staticDir, "index.html"));
+  });
+
 
   return app;
 }
