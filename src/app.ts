@@ -82,6 +82,12 @@ export default async function buildApp(): Promise<express.Express> {
 
   logger.info("✅ Config et prompts chargés");
 
+  // ---------- STATIC FRONTEND EN PROD ----------
+  const staticDir = path.resolve(__dirname, "../public");
+
+  // On ne sert le frontend que si le dossier existe (build réalisé)
+  app.use(express.static(staticDir));
+
   // Routes
   app.use(createApiRouter({
     openai,
@@ -90,12 +96,6 @@ export default async function buildApp(): Promise<express.Express> {
     mentorConfig,
     programs
   }));
-
-  // ---------- STATIC FRONTEND EN PROD ----------
-  const staticDir = path.resolve(__dirname, "../public");
-
-  // On ne sert le frontend que si le dossier existe (build réalisé)
-  app.use(express.static(staticDir));
 
   // Catch-all pour React Router (après les routes API)
   app.get(/^\/(?!api).*/, (_req, res) => {
