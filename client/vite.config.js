@@ -10,7 +10,6 @@ export default defineConfig({
       "/api": {
         target: "http://localhost:3000", // 👈 IMPORTANT : HTTP, pas HTTPS
         changeOrigin: true,
-        // secure: false, ← plus vraiment utile si target est en HTTP
       },
     },
   },
