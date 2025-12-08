@@ -30,7 +30,10 @@ export const openai = new OpenAI({ apiKey: getEnv("OPENAI_API_KEY") });
 const mentorPromptTemplate = getEnv("MENTOR_PROMPT_TEMPLATE");
 const summaryPromptTemplate = getEnv("SUMMARY_PROMPT_TEMPLATE");
 // 
-const FRONTEND_ORIGIN = getEnv("FRONTEND_ORIGIN") ?? "https://localhost:3000";
+const FRONTEND_ORIGIN =
+  process.env.NODE_ENV === "production"
+    ? process.env.FRONTEND_ORIGIN
+    : "https://localhost:3000";
 
 export default async function buildApp(): Promise<express.Express> {
   const app = express();
@@ -44,7 +47,7 @@ export default async function buildApp(): Promise<express.Express> {
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === 'production', // HTTPS en production
+      secure: process.env.NODE_ENV === 'production',
       httpOnly: true, // Protection XSS
       maxAge: 1000 * 60 * 60 * 24 // 24 heures
     }

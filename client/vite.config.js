@@ -3,22 +3,16 @@ import react from "@vitejs/plugin-react";
 import mkcert from "vite-plugin-mkcert";
 
 export default defineConfig({
-  plugins: [
-    react(),
-    mkcert(),
-  ],
   server: {
     https: true,
     port: 5173,
     proxy: {
       "/api": {
-        target: "https://localhost:3000",
+        target: "http://localhost:3000", // 👈 IMPORTANT : HTTP, pas HTTPS
         changeOrigin: true,
-        secure: false
-      }
+        // secure: false, ← plus vraiment utile si target est en HTTP
+      },
     },
-    watch: {
-      usePolling: true,
-    }
-  }
+  },
+  plugins: [react(), mkcert()],
 });

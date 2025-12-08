@@ -17,20 +17,20 @@ export default function createApiRouter(args: any): express.Router {
     const router = express.Router();
 
     // Routes publiques
-    router.use("/api/auth", createAuthRouter());
+    router.use("/auth", createAuthRouter());
 
     // Routes protégées
     router.use(requireAuth);
-    router.use("/api", createHealthRouter(args.openai));
-    router.use("/api", createInitRouter(args.programs));
-    router.use("/api", createProgramRouter(args.programs));
-    router.use("/api", createChatRouter(args));
+    router.use("/", createHealthRouter(args.openai));
+    router.use("/", createInitRouter(args.programs));
+    router.use("/", createProgramRouter(args.programs));
+    router.use("/", createChatRouter(args));
 
     // Routes admin
     router.use(requireAdmin);
-    router.use("/api/admin", createConfigRouter());
-    router.use("/api/admin/prompts", createPromptsRouter());
-    router.use("/api/admin/programs", createProgramsRouter());
+    router.use("/admin", createConfigRouter());
+    router.use("/admin/prompts", createPromptsRouter());
+    router.use("/admin/programs", createProgramsRouter());
 
     logger.info('✅ API routes initialisées.');
 
