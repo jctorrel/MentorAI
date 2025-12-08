@@ -1,5 +1,6 @@
 import express from "express";
 import session from 'express-session';
+import MongoStore from 'connect-mongo'; // ✅ Ajouter cet import
 import cors from "cors";
 import OpenAI from "openai";
 import path from "node:path";
@@ -42,15 +43,25 @@ export default async function buildApp(): Promise<express.Express> {
   app.use(cors({ origin: FRONTEND_ORIGIN, credentials: true }));
   app.use(express.json());
 
+  // ✅ Configuration session avec MongoDB
   app.use(session({
+    store: MongoStore.create({
+      mongoUrl: mongoUri,
+      collectionName: 'sessions',
+      ttl: 60 * 60 * 2, // 2h de conversation
+      autoRemove: 'native',
+      touchAfter: 60 // Optimisation : update max 1x/minute
+    }),
     secret: getEnv("SESSION_SECRET"),
     resave: false,
     saveUninitialized: false,
     cookie: {
       secure: process.env.NODE_ENV === 'production',
-      httpOnly: true, // Protection XSS
-      maxAge: 1000 * 60 * 60 * 24 // 24 heures
-    }
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 2, // 2h (cohérent avec le TTL)
+      sameSite: 'lax'
+    },
+    name: 'mentorai.sid' // Nom custom pour le cookie
   }));
 
   // DB
@@ -102,7 +113,6 @@ export default async function buildApp(): Promise<express.Express> {
   app.get(/^\/(?!api).*/, (_req, res) => {
     res.sendFile(path.join(staticDir, "index.html"));
   });
-
 
   return app;
 }
