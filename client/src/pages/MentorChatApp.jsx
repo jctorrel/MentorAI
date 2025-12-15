@@ -1,19 +1,21 @@
 // client/src/MentorChatApp.jsx
 import React, { useState, useCallback } from "react";
 
-import Header from "../components/Header.jsx";
-import TabBar from "../components/TabBar.jsx";
-import HelperBar from "../components/HelperBar.jsx";
-import ChatWindow from "../components/ChatWindow.jsx";
-import InputBar from "../components/InputBar.jsx";
-import QuickActions from "../components/QuickActions.jsx";
+// Composants UI
+import Header from "../components/Header";
+import TabBar from "../components/TabBar";
+import HelperBar from "../components/HelperBar";
+import ChatWindow from "../components/ChatWindow";
+import InputBar from "../components/InputBar";
+import QuickActions from "../components/QuickActions";
 
+// Hooks & Utils
 import { useBackendHealth } from "../hooks/useBackendHealth";
 import { useChatSession } from "../hooks/useChatSession";
 import { useModules } from "../hooks/useModules";
 import { useAdminSettings } from "../hooks/useAdminSettings";
 import { getCurrentUserEmail } from "../utils/storage";
-import { apiFetch } from "../utils/api.js";
+import { apiFetch } from "../utils/api";
 
 function MentorChatApp() {
     const [studentEmail] = useState(getCurrentUserEmail);
@@ -21,24 +23,19 @@ function MentorChatApp() {
     const [activeMode, setActiveMode] = useState("guided"); // "guided" ou "free"
     const [shouldShowModules, setShouldShowModules] = useState(true);
 
-    // Hook pour les paramètres d'administration
+    // --- Hooks ---
     const { settings } = useAdminSettings();
-
-    // Hook pour surveiller l'état du backend
     const { online, count, limit, incrementCount } = useBackendHealth(studentEmail);
-
-    // Hook pour gérer la session de chat
+    
     const {
         messages,
         isTyping,
         isLoading,
         error,
         handleUserMessage,
-        handleFakeMessage,
         setInitialMessages,
     } = useChatSession(studentEmail, [], incrementCount);
 
-    // Hook pour gérer les modules avec callback d'initialisation
     const handleModulesInitialized = useCallback(
         (initialMessages) => {
             setInitialMessages(initialMessages);
@@ -46,108 +43,113 @@ function MentorChatApp() {
         [setInitialMessages]
     );
 
-    const { modules, clearModules } = useModules(handleModulesInitialized);
+    const { modules } = useModules(handleModulesInitialized);
 
-    /**
-     * Gère le changement de mode
-     */
+    // --- Gestionnaires d'événements ---
+
     const handleModeChange = (newMode) => {
         setActiveMode(newMode);
+        // En mode libre, on cache les modules. En guidé, on les affiche.
+        setShouldShowModules(newMode !== "free");
+    };
 
-        // En mode libre, on cache les modules
-        // En mode guidé, on les réaffiche s'ils existent
-        if (newMode === "free") {
-            setShouldShowModules(false);
-        } else {
-            setShouldShowModules(true);
+    const handleModuleClick = async (module) => {
+        setShouldShowModules(false);
+        // On récupère le contexte du module
+        try {
+            const data = await apiFetch("/api/program", {
+                method: "POST",
+                body: JSON.stringify({ programID: "A1", moduleID: module.id, email: studentEmail }),
+            });
+            // On simule un message utilisateur pour lancer la conversation
+            handleUserMessage(`Bonjour, J'aimerais travailler sur le module : ${module.label} (${data.module})`, activeMode);
+        } catch (err) {
+            console.error("Erreur chargement module", err);
         }
     };
 
-    /**
-     * Gère le clic sur un module dans les QuickActions
-     */
-    const handleModuleClick = async (module) => {
-        setShouldShowModules(false); // Cacher après sélection
-        const data = await apiFetch("/api/program", {
-            method: "POST",
-            body: JSON.stringify({programID: "A1", moduleID: module.id, email: studentEmail}),
-        });
-        
-        handleUserMessage("Bonjour, \n\n J'aimerais travailler sur le module : " + module.label +" (" + data.module + ")");
-    };
-
-    /**
-     * Gère la soumission du formulaire
-     */
     const handleSubmit = async (event) => {
-        event.preventDefault();
+        if(event) event.preventDefault();
         const text = inputValue.trim();
         if (!text || isLoading) return;
 
         setInputValue("");
-
-        // En mode guidé, on masque les modules après envoi
         if (activeMode === "guided") {
             setShouldShowModules(false);
         }
-
         await handleUserMessage(text, activeMode);
     };
 
-    return (
-        <div className="flex justify-center items-stretch min-h-screen p-4 md:p-[18px]">
-            <div className="w-full max-w-[80%] bg-white rounded-3xl p-4 md:p-[18px] shadow-soft border border-gray-100 flex flex-col gap-2.5">
-                <Header
-                    online={online}
-                    count={count}
-                    limit={limit}
-                />
+    // --- Rendu ---
 
-                {/* Afficher TabBar uniquement si le mode libre est activé */}
+    return (
+        <div className="h-screen w-full bg-slate-50 flex flex-col items-center justify-center sm:py-4 md:py-6 overflow-hidden">
+            
+            {/* Conteneur Principal (Card Layout sur Desktop, Fullscreen sur Mobile) */}
+            <main className="w-full h-full max-w-[1500px] bg-white sm:rounded-2xl shadow-2xl shadow-slate-200/50 flex flex-col overflow-hidden border border-slate-200/60 relative">
+                
+                {/* 1. HEADER (Fixe en haut) */}
+                <Header online={online} count={count} limit={limit} />
+
+                {/* 2. BARRE D'ONGLETS (Optionnelle) */}
                 {settings.freeModeEnabled && (
-                    <TabBar
-                        activeMode={activeMode}
-                        onModeChange={handleModeChange}
-                    />
+                    <div className="px-4 pt-4 pb-0 bg-white z-10">
+                        <TabBar activeMode={activeMode} onModeChange={handleModeChange} />
+                    </div>
                 )}
 
-                <div className="grid grid-rows-[auto_1fr_auto] gap-2 flex-1 min-h-0">
-                    <HelperBar
-                        studentEmail={studentEmail}
-                        mode={settings.freeModeEnabled ? activeMode : "guided"}
-                    />
+                {/* 3. BARRE D'INFO CONTEXTUELLE */}
+                <HelperBar
+                    studentEmail={studentEmail}
+                    mode={settings.freeModeEnabled ? activeMode : "guided"}
+                />
 
-                    <ChatWindow messages={messages} isTyping={isTyping} />
-
-                    <div>
-                        {/* Afficher les QuickActions uniquement en mode guidé ET si shouldShowModules est true */}
-                        {(!settings.freeModeEnabled || activeMode === "guided") && shouldShowModules && (
+                {/* 4. ZONE DE CONTENU (Scrollable) */}
+                <div className="flex-1 overflow-y-auto overflow-x-hidden relative bg-white scroll-smooth">
+                    
+                    {/* Cas A : Affichage des Modules (QuickActions) */}
+                    {shouldShowModules && (!settings.freeModeEnabled || activeMode === "guided") ? (
+                        <div className="h-full flex flex-col justify-center">
                             <QuickActions
                                 modules={modules}
                                 onModuleClick={handleModuleClick}
                             />
-                        )}
-
-                        <InputBar
-                            value={inputValue}
-                            onChange={setInputValue}
-                            onSubmit={handleSubmit}
-                            disabled={isLoading}
-                            shouldShowModules={shouldShowModules}
-                            placeholder={
-                                settings.freeModeEnabled && activeMode === "free"
-                                    ? "Posez n'importe quelle question..."
-                                    : "Tapez votre message..."
-                            }
+                        </div>
+                    ) : (
+                        /* Cas B : Fenêtre de Chat */
+                        <ChatWindow 
+                            messages={messages} 
+                            isTyping={isTyping} 
                         />
-                        {error && (
-                            <div className="text-xs text-red-700 px-2 py-1 mt-1 bg-red-50 rounded-lg border border-red-200">
-                                {error}
-                            </div>
-                        )}
-                    </div>
+                    )}
+
                 </div>
-            </div>
+
+                {/* 5. ZONE DE SAISIE (Fixe en bas) */}
+                {/* On cache l'input bar si on affiche les modules, car QuickActions gère l'interaction */}
+                <div className="relative z-20">
+                     {/* Affichage des erreurs globales si besoin */}
+                     {error && (
+                        <div className="absolute bottom-full left-0 right-0 mx-4 mb-2 p-3 bg-red-50 border border-red-100 rounded-lg text-xs text-red-600 shadow-sm flex justify-center animate-in slide-in-from-bottom-2">
+                            {error}
+                        </div>
+                    )}
+                    
+                    <InputBar
+                        value={inputValue}
+                        onChange={setInputValue}
+                        onSubmit={handleSubmit}
+                        disabled={isLoading}
+                        shouldShowModules={shouldShowModules && activeMode === "guided"}
+                        placeholder={
+                            settings.freeModeEnabled && activeMode === "free"
+                                ? "Posez n'importe quelle question au mentor..."
+                                : "Posez une question sur le module..."
+                        }
+                    />
+                </div>
+
+            </main>
         </div>
     );
 }
