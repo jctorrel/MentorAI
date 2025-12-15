@@ -16,16 +16,7 @@ function Header({ online, count, limit }) {
                         src="../../Logo.svg"
                         alt="NWS Logo"
                         className="h-12 w-auto"
-                        // Fallback si l'image ne charge pas (optionnel)
-                        onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'flex';
-                        }}
                     />
-                    {/* Icône de remplacement si pas de logo.svg */}
-                    <div className="hidden h-8 w-8 bg-nws-purple text-white rounded-lg items-center justify-center">
-                        <GraduationCap size={20} />
-                    </div>
                 </div>
 
                 {/* Séparateur vertical */}
