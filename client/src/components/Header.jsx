@@ -1,31 +1,48 @@
 // client/src/components/Header.jsx
+
 import React from "react";
 import StatusBadge from "./StatusBadge";
+import { GraduationCap } from "lucide-react"; // Import d'une icône de secours si pas de logo
 
 function Header({ online, count, limit }) {
     return (
-        <header className="relative flex items-center gap-3.5 px-3 py-2.5 rounded-[20px] overflow-hidden bg-gradient-to-br from-nws-yellow/14 via-nws-teal/12 to-nws-purple/16 border border-indigo-300/26">
-            {/* Barre colorée en bas */}
-            <div className="absolute left-0 right-0 bottom-0 h-[3px] bg-gradient-to-r from-nws-yellow via-nws-teal via-nws-purple to-nws-red opacity-90" />
+        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 z-10 sticky top-0 shadow-sm">
+            
+            {/* Partie Gauche : Identité */}
+            <div className="flex items-center gap-3">
+                {/* Logo NWS */}
+                <div className="flex-shrink-0">
+                    <img
+                        src="/logo.svg"
+                        alt="NWS Logo"
+                        className="h-12 w-auto"
+                        // Fallback si l'image ne charge pas (optionnel)
+                        onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                        }}
+                    />
+                    {/* Icône de remplacement si pas de logo.svg */}
+                    <div className="hidden h-8 w-8 bg-nws-purple text-white rounded-lg items-center justify-center">
+                        <GraduationCap size={20} />
+                    </div>
+                </div>
 
-            {/* Logo */}
-            <img
-                src="/logo.svg"
-                alt="Normandie Web School Logo"
-                className="w-[120px] h-auto"
-            />
+                {/* Séparateur vertical */}
+                <div className="h-6 w-px bg-slate-200 mx-1 hidden sm:block"></div>
 
-            {/* Titre */}
-            <div className="flex flex-col gap-[1px]">
-                <h1 className="text-lg font-bold tracking-[0.02em] m-0">
-                    NWS Mentor AI
-                </h1>
-                <span className="text-[11px] text-gray-500">
-                    Votre assistant pédagogique intelligent
-                </span>
+                {/* Titre & Sous-titre */}
+                <div className="flex flex-col">
+                    <h1 className="text-m font-bold text-slate-800 tracking-tight leading-none">
+                        Mentor AI
+                    </h1>
+                    <span className="text-[10px] sm:text-[13px] text-slate-500 font-medium mt-0.5">
+                        Assistant Pédagogique
+                    </span>
+                </div>
             </div>
 
-            {/* Badge statut (caché sur mobile) */}
+            {/* Partie Droite : Statut */}
             <StatusBadge
                 online={online}
                 count={count}

@@ -1,53 +1,48 @@
 // client/src/components/StatusBadge.jsx
-import React from "react";
+import React from 'react';
+import { Wifi, Zap, AlertCircle } from 'lucide-react';
 
-function StatusBadge({ online = false, count = 0, limit = 0 }) {
-  // Si count et limit sont tous les deux 0, on est probablement en chargement
-  const isLoading = count === 0 && limit === 0 && !online;
+function StatusBadge({ online, count = 0, limit = 50 }) {
+    // Calcul du pourcentage d'utilisation pour la couleur
+    const percentage = Math.min((count / limit) * 100, 100);
+    
+    // Couleur dynamique selon l'utilisation
+    let limitColor = "text-emerald-600 bg-emerald-50 border-emerald-200";
+    if (percentage > 75) limitColor = "text-amber-600 bg-amber-50 border-amber-200";
+    if (percentage >= 100) limitColor = "text-red-600 bg-red-50 border-red-200";
 
-  if (isLoading) {
     return (
-      <div className="ml-auto hidden sm:flex flex-col items-end gap-1 text-[9px] text-gray-500">
-        <span className="px-2 py-[3px] rounded-full border border-indigo-300/70 bg-white/90 inline-flex items-center gap-1.5 text-gray-600">
-          <span className="w-2.5 h-2.5 rounded-full bg-gray-400 animate-pulse" />
-          Chargement...
-        </span>
-      </div>
+        <div className="flex items-center gap-3">
+            {/* Indicateur de Quota (Tokens) */}
+            <div 
+                className={`hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full border text-xs font-medium transition-colors ${limitColor}`}
+                title="Messages utilisés dans cette session"
+            >
+                <Zap size={12} className={percentage >= 100 ? "fill-current" : ""} />
+                <span>{count} / {limit}</span>
+            </div>
+
+            {/* Indicateur de Connexion */}
+            <div className={`flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-semibold ${
+                online 
+                    ? "bg-slate-50 border-slate-200 text-slate-600" 
+                    : "bg-red-50 border-red-200 text-red-600"
+            }`}>
+                <div className="relative flex h-2 w-2">
+                    {online && (
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    )}
+                    <span className={`relative inline-flex rounded-full h-2 w-2 ${online ? "bg-green-500" : "bg-red-500"}`}></span>
+                </div>
+                <span className="hidden md:inline">
+                    {online ? "Système Opérationnel" : "Déconnecté"}
+                </span>
+                <span className="md:hidden">
+                    {online ? "En ligne" : "Hors ligne"}
+                </span>
+            </div>
+        </div>
     );
-  }
-
-  const isAtLimit = count >= limit;
-  const isNearLimit = count >= limit * 0.85; // À 85% de la limite
-
-  // Déterminer le label et le style
-  let statusLabel, badgeColor, textColor;
-
-  if (!online) {
-    statusLabel = "Hors ligne";
-    badgeColor = "bg-red-500";
-    textColor = "text-red-700";
-  } else if (isAtLimit) {
-    statusLabel = "Limite atteinte";
-    badgeColor = "bg-red-500";
-    textColor = "text-red-700";
-  } else if (isNearLimit) {
-    statusLabel = "En ligne (/!\\ Limite proche)";
-    badgeColor = "bg-orange-500";
-    textColor = "text-orange-700";
-  } else {
-    statusLabel = "En ligne";
-    badgeColor = "bg-green-500";
-    textColor = "text-green-700";
-  }
-
-  return (
-    <div className="ml-auto hidden sm:flex flex-col items-end gap-1 text-[9px] text-gray-500">
-      <span className={`px-2 py-[3px] rounded-full border border-indigo-300/70 bg-white/90 inline-flex items-center gap-1.5 ${textColor}`}>
-        <span className={`w-2.5 h-2.5 rounded-full ${badgeColor}`} />
-        {statusLabel} <small>({count}/{limit})</small>
-      </span>
-    </div>
-  );
 }
 
 export default StatusBadge;

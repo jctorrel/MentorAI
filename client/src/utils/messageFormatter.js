@@ -18,9 +18,7 @@ const MONTHS = [
 
 const INIT_MESSAGE =
     "Bonjour 👋\n\n" +
-    "Je suis le mentor pédagogique de la Normandie Web School. \n\n " +
-    "Sur quoi souhaites-tu travailler ? \n\n" +
-    "# **_↓↓ Utilise la barre de navigation pour choisir l'un des modules disponibles↓↓_**";
+    "Je suis le mentor pédagogique de la Normandie Web School. \n\n ";
 
 const DEFAULT_WELCOME_MESSAGE =
     "Bonjour 👋\n" +
