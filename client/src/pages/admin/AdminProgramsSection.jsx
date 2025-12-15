@@ -1,157 +1,100 @@
 // src/pages/admin/AdminProgramsSection.jsx
-import { useState } from "react";
+import React, { useEffect } from "react";
 import { usePrograms } from "../../hooks/usePrograms";
-import { useProgramEditor } from "../../hooks/useProgramEditor";
-import ProgramsList from "../../components/admin/ProgramsList";
-import ProgramEditor from "../../components/admin/ProgramEditor";
+import ProgramSelector from "../../components/admin/ProgramSelector";
+import ProgramViewer from "../../components/admin/ProgramViewer";
 
 function AdminProgramsSection() {
-    const [actionError, setActionError] = useState(null);
-
     const {
         programs,
         loading,
         error: loadError,
         selectedProgram,
         selectProgram,
-        createProgram,
-        deleteProgram: deleteProgramFromList,
         refreshPrograms,
     } = usePrograms();
 
-    const {
-        saving,
-        saveMessage,
-        error: saveError,
-        save,
-        deleteProgram,
-        clearMessages,
-    } = useProgramEditor(refreshPrograms);
-
-    /**
-     * Gère la création d'un nouveau programme
-     */
-    const handleCreate = async () => {
-        setActionError(null);
-        clearMessages();
-
-        const key = prompt("Clé du nouveau programme (ex: A2, B1…) :");
-        if (!key) return;
-
-        try {
-            await createProgram(key.trim());
-        } catch (error) {
-            setActionError(error.message);
+    // Optionnel : Sélectionner automatiquement le premier programme au chargement
+    useEffect(() => {
+        if (!loading && programs.length > 0 && !selectedProgram) {
+            selectProgram(programs[0].key);
         }
-    };
+    }, [loading, programs, selectedProgram, selectProgram]);
 
-    /**
-     * Gère la suppression d'un programme
-     */
-    const handleDelete = async (programKey) => {
-        setActionError(null);
-
-        try {
-            await deleteProgram(programKey);
-            // Après suppression, désélectionner le programme
-            selectProgram(null);
-        } catch (error) {
-            setActionError(error.message);
-        }
-    };
+    // --- Gestion des états de chargement ---
 
     if (loading) {
         return (
-            <section style={styles.section}>
-                <h2 style={styles.title}>Programmes</h2>
-                <p style={styles.loadingText}>Chargement…</p>
-            </section>
+            <div className="mt-8 py-12 text-center border-t border-slate-200">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-nws-purple"></div>
+                <p className="mt-2 text-slate-500 text-sm">Chargement des programmes...</p>
+            </div>
         );
     }
 
-    // Afficher l'erreur de chargement
     if (loadError) {
         return (
-            <section style={styles.section}>
-                <h2 style={styles.title}>Programmes</h2>
-                <p style={styles.errorText}>{loadError}</p>
-            </section>
+            <div className="mt-8 py-8 text-center border-t border-slate-200">
+                <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg inline-block">
+                    <p className="font-medium">Erreur de chargement</p>
+                    <p className="text-sm opacity-80">{loadError}</p>
+                </div>
+                <button 
+                    onClick={refreshPrograms}
+                    className="block mx-auto mt-4 text-sm text-nws-purple hover:underline"
+                >
+                    Réessayer
+                </button>
+            </div>
         );
     }
 
-    // Combiner les erreurs d'action et de sauvegarde
-    const displayError = actionError || saveError;
+    // --- Rendu Principal ---
 
-    
-    console.log('selectedProgram dans AdminProgramsSection:', selectedProgram); 
     return (
-        <section style={styles.section}>
-            <h2 style={styles.title}>Programmes</h2>
-            <p style={styles.help}>
-                Sélectionne un programme dans la liste pour l'éditer.
-            </p>
+        <section className="mt-8 pt-8 border-t border-slate-200 animate-in fade-in slide-in-from-bottom-2 duration-500">
+            
+            {/* En-tête de section */}
+            <div className="mb-8 text-center sm:text-left">
+                <h2 className="text-2xl font-bold text-slate-800">
+                    Programmes
+                </h2>
+                <p className="text-slate-500 mt-1">
+                    Gérez le contenu des programmes académiques via les onglets ci-dessous.
+                </p>
+            </div>
 
-            {displayError && <p style={styles.errorText}>{displayError}</p>}
+            {/* Zone de Contenu */}
+            <div className="flex flex-col gap-6">
+                
+                {/* 1. Le Sélecteur (Onglets) */}
+                <div className="w-full">
+                    <ProgramSelector
+                        programs={programs}
+                        selectedKey={selectedProgram?.key}
+                        onSelect={selectProgram}
+                    />
+                </div>
 
-            <div style={styles.layout}>
-                <ProgramsList
-                    programs={programs}
-                    selectedKey={selectedProgram?.key}
-                    onSelect={selectProgram}
-                    onCreate={handleCreate}
-                />
-
-                <ProgramEditor
-                    selectedProgram={selectedProgram}
-                    onSave={save}
-                    onDelete={handleDelete}
-                    saving={saving}
-                    saveMessage={saveMessage}
-                    error={saveError}
-                />
+                {/* 2. Le Viewer (Contenu du programme sélectionné) */}
+                <div className="min-h-[300px] bg-white rounded-2xl p-1 md:p-6">
+                    {programs.length === 0 ? (
+                        <div className="text-center py-10 text-slate-400 italic bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                            Aucun programme disponible pour le moment.
+                        </div>
+                    ) : selectedProgram ? (
+                        <ProgramViewer
+                            program={selectedProgram}
+                        />
+                    ) : (
+                        <div className="text-center py-10 text-slate-400">
+                            Sélectionnez un programme ci-dessus.
+                        </div>
+                    )}
+                </div>
             </div>
         </section>
     );
 }
-
-const styles = {
-    section: {
-        marginTop: "1.5rem",
-        paddingTop: "1.5rem",
-        borderTop: "1px solid #e5e7eb",
-    },
-    title: {
-        margin: 0,
-        marginBottom: "0.5rem",
-        fontSize: "1.1rem",
-        fontWeight: 600,
-        color: "#0f172a",
-    },
-    help: {
-        marginTop: 0,
-        marginBottom: "1rem",
-        fontSize: "0.9rem",
-        color: "#6b7280",
-    },
-    layout: {
-        display: "flex",
-        gap: "1rem",
-        alignItems: "stretch",
-    },
-    loadingText: {
-        fontSize: "0.9rem",
-        color: "#64748b",
-    },
-    errorText: {
-        fontSize: "0.9rem",
-        color: "#dc2626",
-        marginTop: "0.5rem",
-    },
-    successText: {
-        fontSize: "0.9rem",
-        color: "#16a34a",
-        marginTop: "0.5rem",
-    },
-};
 
 export default AdminProgramsSection;

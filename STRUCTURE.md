@@ -2,7 +2,6 @@
 
 ```
 MentorAI/
-├── MentorAI.code-workspace           # Configuration VS Code pour le workspace
 ├── package.json                      # Dépendances & scripts (workspace client)
 ├── README.md                         # Documentation principale
 ├── STRUCTURE.md                      # (Ce fichier) arborescence du projet
