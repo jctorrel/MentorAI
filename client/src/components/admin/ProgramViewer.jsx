@@ -5,12 +5,12 @@ import { Calendar, Package, CheckCircle2, Clock } from "lucide-react";
 
 // Configuration des mois (statique pour l'affichage)
 const MONTHS = [
-    { value: 1, label: 'Janvier' }, { value: 2, label: 'Février' },
-    { value: 3, label: 'Mars' }, { value: 4, label: 'Avril' },
-    { value: 5, label: 'Mai' }, { value: 6, label: 'Juin' },
-    { value: 7, label: 'Juillet' }, { value: 8, label: 'Août' },
-    { value: 9, label: 'Septembre' }, { value: 10, label: 'Octobre' },
-    { value: 11, label: 'Novembre' }, { value: 12, label: 'Décembre' },
+    { value: 1, label: 'jan' }, { value: 2, label: 'fév' },
+    { value: 3, label: 'mar' }, { value: 4, label: 'avr' },
+    { value: 5, label: 'mai' }, { value: 6, label: 'jui' },
+    { value: 7, label: 'jui' }, { value: 8, label: 'aoû' },
+    { value: 9, label: 'sep' }, { value: 10, label: 'oct' },
+    { value: 11, label: 'nov' }, { value: 12, label: 'déc' },
 ];
 
 const getMonthLabel = (val) => MONTHS.find(m => m.value === val)?.label || val;
@@ -28,7 +28,7 @@ export default function ProgramViewer({ program }) {
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-12 font-sans text-slate-800">
-            
+
             {/* --- En-tête du Programme --- */}
             <header className="mb-16 text-center space-y-4">
                 <span className="inline-block py-1 px-4 rounded-full bg-nws-purple/10 text-nws-purple font-bold text-sm tracking-wide uppercase">
@@ -51,58 +51,95 @@ export default function ProgramViewer({ program }) {
                     const theme = THEME_COLORS[index % THEME_COLORS.length];
 
                     return (
-                        <article 
+                        <article
                             key={module.id || index}
                             className={`
-                                group relative bg-white rounded-xxl p-6 
-                                shadow-soft hover:shadow-lg transition-all duration-300 
-                                border-t-4 ${theme.border} flex flex-col h-full
+                                group flex flex-col h-full relative
+                                bg-white rounded-2xl overflow-hidden
+                                border border-slate-200
+                                shadow-sm hover:shadow-xl hover:-translate-y-1
+                                transition-all duration-300 ease-out
                             `}
                         >
-                            {/* Période */}
-                            <div className="flex justify-between items-center mb-4">
-                                <div className={`px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider ${theme.bg} ${theme.text}`}>
-                                    {getMonthLabel(module.start_month)} — {getMonthLabel(module.end_month)}
+                            {/* Barre de couleur décorative en haut (remplace la bordure) */}
+                            <div className={`h-2 w-full ${theme.bullet}`} />
+
+                            {/* --- Corps de la carte (Contenu) --- */}
+                            <div className="p-6 flex-grow flex flex-col">
+
+                                {/* En-tête : Période */}
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className={`
+                                            inline-flex items-center gap-1.5 px-3 py-1 rounded-full 
+                                            text-xs font-bold uppercase tracking-wide 
+                                            bg-slate-50 text-slate-500 border border-slate-100
+                                            group-hover:border-slate-200 transition-colors
+                                        `}>
+                                        <Calendar className="w-3 h-3 text-slate-400" />
+                                        <span>
+                                            {getMonthLabel(module.start_month)} <span className="text-slate-300 mx-1">→</span> {getMonthLabel(module.end_month)}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Titre */}
+                                <h3 className={`
+                                                text-lg font-bold mb-4 leading-tight 
+                                                ${theme.text} opacity-50 group-hover:opacity-100 
+                                                transition-opacity duration-300
+                                            `}>
+                                    {module.label}
+                                </h3>
+
+                                {/* Liste à puces stylisée */}
+                                <div className="space-y-3 mb-6">
+                                    {module.content && module.content.length > 0 ? (
+                                        <ul className="space-y-2.5">
+                                            {module.content.map((line, i) => (
+                                                <li key={i} className="flex items-start text-sm text-slate-600">
+                                                    {/* Puce personnalisée (Check ou point coloré) */}
+                                                    <span className={`mt-1 mr-3 flex-shrink-0 ${theme.text}`}>
+                                                        <CheckCircle2 className="w-4 h-4 opacity-80" /> {/* ou • */}
+                                                    </span>
+                                                    <span className="leading-relaxed opacity-90">{line}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        <p className="text-slate-400 italic text-sm bg-slate-50 p-3 rounded-lg border border-dashed border-slate-200 text-center">
+                                            Le contenu pédagogique sera bientôt disponible.
+                                        </p>
+                                    )}
                                 </div>
                             </div>
 
-                            {/* Titre du Module */}
-                            <h3 className="text-xl font-bold text-slate-800 mb-6 group-hover:text-nws-purple transition-colors">
-                                {module.label}
-                            </h3>
-
-                            {/* Contenu (Liste à puces) */}
-                            <div className="flex-grow">
-                                {module.content && module.content.length > 0 ? (
-                                    <ul className="space-y-3">
-                                        {module.content.map((line, i) => (
-                                            <li key={i} className="flex items-start text-sm text-slate-600 leading-snug">
-                                                <span className={`mt-1.5 mr-3 w-2 h-2 rounded-full flex-shrink-0 ${theme.bullet}`} />
-                                                <span>{line}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                ) : (
-                                    <p className="text-slate-400 italic text-sm">Contenu à venir.</p>
-                                )}
-                            </div>
-
-                            {/* Livrables (Section Footer de la carte) */}
+                            {/* --- Footer (Zone Livrables) - Séparée visuellement --- */}
                             {module.deliverables && module.deliverables.length > 0 && (
-                                <div className="mt-8 pt-4 border-t border-slate-100">
-                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">
-                                        Livrables attendus
-                                    </p>
-                                    <div className="space-y-2">
+                                <div className="bg-slate-50/80 border-t border-slate-100 p-4 mt-auto backdrop-blur-sm">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <div className={`p-1.5 rounded-md ${theme.bg} bg-opacity-10`}>
+                                            <Package className={`w-3.5 h-3.5 ${theme.text}`} /> {/* ou 📦 */}
+                                        </div>
+                                        <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                                            Livrables attendus
+                                        </p>
+                                    </div>
+
+                                    <div className="grid gap-2">
                                         {module.deliverables.map((deliv, idx) => (
-                                            <div key={idx} className="flex items-center justify-between text-xs bg-slate-50 p-2 rounded-lg">
-                                                <span className="font-medium text-slate-700 truncate pr-2" title={deliv.descriptif}>
-                                                    📦 {deliv.descriptif}
+                                            <div
+                                                key={idx}
+                                                className="flex items-center justify-between bg-white border border-slate-200 p-2.5 rounded-lg shadow-sm group/item hover:border-slate-300 transition-colors"
+                                            >
+                                                <span className="text-xs font-medium text-slate-700 truncate mr-2" title={deliv.descriptif}>
+                                                    {deliv.descriptif}
                                                 </span>
+
                                                 {deliv.date && (
-                                                    <span className="whitespace-nowrap text-slate-400">
+                                                    <div className="flex items-center gap-1 flex-shrink-0 bg-slate-100 px-2 py-1 rounded text-[10px] font-semibold text-slate-500">
+                                                        <Clock className="w-3 h-3" />
                                                         {new Date(deliv.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
-                                                    </span>
+                                                    </div>
                                                 )}
                                             </div>
                                         ))}

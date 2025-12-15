@@ -60,7 +60,7 @@ function AdminProgramsSection() {
                     Programmes
                 </h2>
                 <p className="text-slate-500 mt-1">
-                    Gérez le contenu des programmes académiques via les onglets ci-dessous.
+                    Visualisation des programmes de formation.
                 </p>
             </div>
 
