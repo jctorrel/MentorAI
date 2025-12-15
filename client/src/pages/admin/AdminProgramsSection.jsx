@@ -52,17 +52,7 @@ function AdminProgramsSection() {
     // --- Rendu Principal ---
 
     return (
-        <section className="mt-8 pt-8 border-t border-slate-200 animate-in fade-in slide-in-from-bottom-2 duration-500">
-            
-            {/* En-tête de section */}
-            <div className="mb-8 text-center sm:text-left">
-                <h2 className="text-2xl font-bold text-slate-800">
-                    Programmes
-                </h2>
-                <p className="text-slate-500 mt-1">
-                    Visualisation des programmes de formation.
-                </p>
-            </div>
+        <section className="mt-1 pt-8 border-t border-slate-200 animate-in fade-in slide-in-from-bottom-2 duration-500">
 
             {/* Zone de Contenu */}
             <div className="flex flex-col gap-6">
@@ -77,7 +67,7 @@ function AdminProgramsSection() {
                 </div>
 
                 {/* 2. Le Viewer (Contenu du programme sélectionné) */}
-                <div className="min-h-[300px] bg-white rounded-2xl p-1 md:p-6">
+                <div className="min-h-[300px] bg-white rounded-2xl p-1 md:p-1">
                     {programs.length === 0 ? (
                         <div className="text-center py-10 text-slate-400 italic bg-slate-50 rounded-xl border border-dashed border-slate-200">
                             Aucun programme disponible pour le moment.

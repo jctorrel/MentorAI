@@ -1,19 +1,36 @@
 // src/components/admin/PromptsList.jsx
 
+import React from 'react';
+import { List, Hash, ChevronRight, Search } from 'lucide-react';
+
 function PromptsList({ prompts, selectedKey, onSelect }) {
-    if (prompts.length === 0) {
+    
+    // --- État vide ---
+    if (!prompts || prompts.length === 0) {
         return (
-            <div style={styles.sidebar}>
-                <h3 style={styles.sidebarTitle}>Liste des prompts</h3>
-                <p style={styles.sidebarEmpty}>Aucun prompt trouvé.</p>
+            <div className="w-72 h-full bg-slate-50 rounded-2xl border border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 p-6">
+                <List className="w-8 h-8 mb-2 opacity-50" />
+                <p className="text-sm font-medium">Aucun prompt</p>
             </div>
         );
     }
 
     return (
-        <div style={styles.sidebar}>
-            <h3 style={styles.sidebarTitle}>Liste des prompts</h3>
-            <ul style={styles.promptList}>
+        <aside className="w-full md:w-72 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-full overflow-hidden">
+            
+            {/* --- En-tête de la liste --- */}
+            <div className="p-4 border-b border-slate-100 bg-slate-50/50">
+                <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2 uppercase tracking-wide">
+                    <List className="w-4 h-4 text-slate-400" />
+                    Bibliothèque
+                </h3>
+                <p className="text-xs text-slate-500 mt-1 pl-6">
+                    {prompts.length} prompt{prompts.length > 1 ? 's' : ''} disponible{prompts.length > 1 ? 's' : ''}
+                </p>
+            </div>
+
+            {/* --- Liste Défilante --- */}
+            <div className="flex-grow overflow-y-auto p-3 space-y-2 custom-scrollbar">
                 {prompts.map((prompt) => (
                     <PromptItem
                         key={prompt.key}
@@ -22,73 +39,50 @@ function PromptsList({ prompts, selectedKey, onSelect }) {
                         onClick={() => onSelect(prompt.key)}
                     />
                 ))}
-            </ul>
-        </div>
+            </div>
+        </aside>
     );
 }
 
 function PromptItem({ prompt, isActive, onClick }) {
-    const itemStyle = {
-        ...styles.promptItem,
-        ...(isActive ? styles.promptItemActive : {}),
-    };
-
     return (
-        <li style={itemStyle} onClick={onClick}>
-            <div style={styles.promptKey}>{prompt.key}</div>
-            {prompt.label && (
-                <div style={styles.promptLabel}>{prompt.label}</div>
+        <button
+            onClick={onClick}
+            className={`
+                group w-full text-left relative flex flex-col gap-1 p-3 rounded-xl transition-all duration-200 border
+                ${isActive 
+                    ? 'bg-nws-purple/5 border-nws-purple shadow-sm z-10' 
+                    : 'bg-white border-transparent hover:bg-slate-50 hover:border-slate-200'
+                }
+            `}
+        >
+            {/* Indicateur actif (Barre latérale ou icône) */}
+            {isActive && (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-nws-purple animate-in slide-in-from-left-2 fade-in">
+                    <ChevronRight className="w-4 h-4" />
+                </div>
             )}
-        </li>
+
+            {/* Clé Technique (ex: SYSTEM_MENTOR) */}
+            <div className="flex items-center gap-1.5">
+                <Hash className={`w-3 h-3 ${isActive ? 'text-nws-purple' : 'text-slate-400'}`} />
+                <span className={`
+                    text-xs font-mono font-bold truncate pr-4
+                    ${isActive ? 'text-nws-purple' : 'text-slate-600 group-hover:text-slate-800'}
+                `}>
+                    {prompt.key}
+                </span>
+            </div>
+
+            {/* Label (Description) */}
+            <div className={`
+                text-sm pl-4.5 line-clamp-2
+                ${isActive ? 'text-slate-700 font-medium' : 'text-slate-500 group-hover:text-slate-600'}
+            `}>
+                {prompt.label || <span className="italic opacity-50">Sans description</span>}
+            </div>
+        </button>
     );
 }
-
-const styles = {
-    sidebar: {
-        width: "260px",
-        borderRadius: "1rem",
-        border: "1px solid #e5e7eb",
-        backgroundColor: "#f9fafb",
-        padding: "0.75rem",
-        maxHeight: "400px",
-        overflowY: "auto",
-    },
-    sidebarTitle: {
-        margin: "0 0 0.5rem 0",
-        fontSize: "0.9rem",
-        fontWeight: 600,
-        color: "#111827",
-    },
-    sidebarEmpty: {
-        margin: 0,
-        fontSize: "0.85rem",
-        color: "#6b7280",
-    },
-    promptList: {
-        listStyle: "none",
-        margin: 0,
-        padding: 0,
-    },
-    promptItem: {
-        padding: "0.4rem 0.5rem",
-        borderRadius: "0.6rem",
-        cursor: "pointer",
-        marginBottom: "0.25rem",
-        transition: "background-color 0.15s",
-    },
-    promptItemActive: {
-        backgroundColor: "#e0f2fe",
-    },
-    promptKey: {
-        fontSize: "0.8rem",
-        fontWeight: 600,
-        color: "#0f172a",
-    },
-    promptLabel: {
-        fontSize: "0.75rem",
-        color: "#6b7280",
-        marginTop: "0.1rem",
-    },
-};
 
 export default PromptsList;

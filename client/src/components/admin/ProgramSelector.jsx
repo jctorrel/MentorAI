@@ -4,15 +4,15 @@ import React from 'react';
 
 export default function ProgramSelector({ programs, selectedKey, onSelect }) {
     
-    // Si aucun programme, on n'affiche rien ou un message discret
+    // Si aucun programme
     if (!programs || programs.length === 0) {
         return null;
     }
 
     return (
-        <nav className="mb-10">
+        <nav className="mb-1">
             {/* Conteneur Flex pour aligner les onglets */}
-            <ul className="flex flex-wrap justify-center gap-4">
+            <ul className="flex flex-wrap justify-center gap-5">
                 {programs.map((program) => {
                     const isActive = program.key === selectedKey;
 

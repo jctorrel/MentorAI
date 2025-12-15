@@ -1,92 +1,75 @@
 // src/components/admin/AdminStatus.jsx
+import React from 'react';
 import { useNavigate } from "react-router-dom";
+import { Lock, AlertCircle, CheckCircle2, ArrowLeft, Loader2 } from "lucide-react";
 
-export function LoadingState() {
+/**
+ * Affiche un spinner de chargement centré
+ */
+export function LoadingState({ message = "Vérification des droits..." }) {
     return (
-        <p style={styles.info}>Vérification des droits…</p>
+        <div className="flex flex-col items-center justify-center py-12 px-4 animate-in fade-in duration-500">
+            <Loader2 className="w-8 h-8 text-nws-purple animate-spin mb-3" />
+            <p className="text-slate-500 font-medium text-sm">{message}</p>
+        </div>
     );
 }
 
+/**
+ * Affiche une carte "Accès Refusé" (403)
+ */
 export function AccessDenied() {
     const navigate = useNavigate();
 
     return (
-        <div style={styles.errorBox}>
-            <p style={styles.errorTitle}>Accès refusé</p>
-            <p style={styles.errorText}>
-                Votre compte n'est pas autorisé à accéder à l'administration.
+        <div className="min-h-[60vh] flex flex-col items-center justify-center p-4 animate-in zoom-in-95 duration-300">
+            <div className="bg-red-50 p-4 rounded-full mb-6 ring-8 ring-red-50/50">
+                <Lock className="w-10 h-10 text-red-500" />
+            </div>
+            
+            <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">
+                Accès refusé
+            </h1>
+            
+            <p className="text-slate-500 text-center max-w-md mb-8 leading-relaxed">
+                Votre compte ne dispose pas des droits administrateur nécessaires pour accéder à cette section.
             </p>
+
             <button 
-                style={styles.buttonSecondary} 
                 onClick={() => navigate("/")}
+                className="flex items-center gap-2 px-6 py-2.5 bg-white text-slate-700 border border-slate-200 rounded-full hover:bg-slate-50 hover:border-slate-300 transition-all font-medium shadow-sm hover:shadow-md"
             >
-                ← Retour à l'application
+                <ArrowLeft className="w-4 h-4" />
+                Retour à l'application
             </button>
         </div>
     );
 }
 
+/**
+ * Affiche un petit message d'erreur (souvent dans les formulaires)
+ */
 export function ErrorMessage({ message }) {
     if (!message) return null;
 
     return (
-        <p style={styles.errorTextSmall}>
-            Une erreur est survenue : {message}
-        </p>
+        <div className="flex items-start gap-3 p-3 bg-red-50 border border-red-100 rounded-lg text-red-700 text-sm animate-in slide-in-from-top-1 duration-300" role="alert">
+            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+            <span className="font-medium">{message}</span>
+        </div>
     );
 }
 
+/**
+ * Affiche un petit message de succès
+ */
 export function SuccessMessage({ message }) {
     if (!message) return null;
 
     return (
-        <p style={styles.successText}>
-            {message}
-        </p>
+        <div className="flex items-start gap-3 p-3 bg-green-50 border border-green-100 rounded-lg text-green-700 text-sm animate-in slide-in-from-top-1 duration-300" role="status">
+            <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" />
+            <span className="font-medium">{message}</span>
+        </div>
     );
 }
-
-const styles = {
-    info: {
-        fontSize: "0.9rem",
-        color: "#64748b",
-    },
-    errorBox: {
-        borderRadius: "1rem",
-        padding: "1rem 1.25rem",
-        backgroundColor: "#fef2f2",
-        border: "1px solid #fecaca",
-        marginTop: "0.5rem",
-        marginBottom: "1rem",
-    },
-    errorTitle: {
-        margin: 0,
-        fontWeight: 600,
-        color: "#b91c1c",
-        marginBottom: "0.25rem",
-    },
-    errorText: {
-        margin: 0,
-        fontSize: "0.9rem",
-        color: "#991b1b",
-        marginBottom: "0.75rem",
-    },
-    errorTextSmall: {
-        marginTop: "0.5rem",
-        fontSize: "0.8rem",
-        color: "#ef4444",
-    },
-    successText: {
-        marginTop: "0.5rem",
-        fontSize: "0.85rem",
-        color: "#16a34a",
-    },
-    buttonSecondary: {
-        padding: "0.5rem 0.9rem",
-        borderRadius: "999px",
-        border: "1px solid #cbd5f5",
-        backgroundColor: "#f8fafc",
-        fontSize: "0.85rem",
-        cursor: "pointer",
-    },
-};

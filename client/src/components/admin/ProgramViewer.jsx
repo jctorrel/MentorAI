@@ -27,7 +27,7 @@ export default function ProgramViewer({ program }) {
     if (!program) return null;
 
     return (
-        <div className="max-w-7xl mx-auto px-4 py-12 font-sans text-slate-800">
+        <div className="max-w-7xl mx-auto px-1 py-5 font-sans text-slate-800">
 
             {/* --- En-tête du Programme --- */}
             <header className="mb-16 text-center space-y-4">
