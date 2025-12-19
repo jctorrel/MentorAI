@@ -7,7 +7,7 @@ import AdminHome from "./admin/AdminHome";
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/MentorAI">
       <Routes>
         <Route path="/login" element={<Login />} />
 

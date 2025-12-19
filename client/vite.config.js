@@ -6,9 +6,10 @@ export default defineConfig({
   server: {
     https: true,
     port: 5173,
+    base: "/MentorAI/",
     proxy: {
       "/api": {
-        target: "http://localhost:3000", // 👈 IMPORTANT : HTTP, pas HTTPS
+        target: "http://localhost:3001", // 👈 IMPORTANT : HTTP, pas HTTPS
         changeOrigin: true,
       },
     },
