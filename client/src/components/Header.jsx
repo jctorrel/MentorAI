@@ -13,7 +13,7 @@ function Header({ online, count, limit }) {
                 {/* Logo NWS */}
                 <div className="flex-shrink-0">
                     <img
-                        src="../../Logo.svg"
+                        src="Logo.svg"
                         alt="NWS Logo"
                         className="h-12 w-auto"
                     />

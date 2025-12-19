@@ -56,18 +56,21 @@ function Login() {
                     body: JSON.stringify({ idToken }),
                 });
 
-                const data = await res.json();
-
                 if (!res.ok) {
-                    throw new Error(data.error || "Erreur d'authentification");
+                    throw new Error(`HTTP ${res.status}: ${text.slice(0, 200)}`);
                 }
 
+                if (!contentType.includes("application/json")) {
+                    throw new Error(`Réponse non JSON (${contentType}): ${text.slice(0, 200)}`);
+                }
+
+                const data = await res.json();
                 localStorage.setItem("access_token", data.token);
                 if (data.user) {
                     localStorage.setItem("user", JSON.stringify(data.user));
                 }
 
-                window.location.href = "/MentorAI";
+                window.location.href = "/MentorAI/";
             } catch (e) {
                 console.error(e);
                 setError(e.message || "Une erreur est survenue lors de la connexion.");
@@ -79,19 +82,19 @@ function Login() {
 
     return (
         <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-slate-50 font-sans">
-            
+
             {/* --- Décors d'arrière-plan (Blobs animés) --- */}
             <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-nws-purple/20 rounded-full blur-[120px] mix-blend-multiply opacity-70 animate-blob" />
             <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-nws-teal/20 rounded-full blur-[120px] mix-blend-multiply opacity-70 animate-blob animation-delay-2000" />
-            
+
             <div className="relative z-10 w-full max-w-[420px] p-6">
-                
+
                 {/* --- Carte de connexion --- */}
                 <div className="bg-white/80 backdrop-blur-xl border border-white/50 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.08)] rounded-[32px] p-8 sm:p-10 text-center">
-                    
+
                     {/* Logo / Icône */}
                     <div className="mx-auto w-16 h-16 bg-gradient-to-br from-nws-purple to-nws-teal rounded-2xl flex items-center justify-center shadow-lg mb-6 text-white rotate-3 hover:rotate-6 transition-transform duration-300">
-                         {/* Tu peux remettre <img src="/logo.svg" /> ici si tu préfères */}
+                        {/* Tu peux remettre <img src="/logo.svg" /> ici si tu préfères */}
                         <GraduationCap size={32} />
                     </div>
 
@@ -100,7 +103,7 @@ function Login() {
                         Bienvenue sur Mentor AI
                     </h1>
                     <p className="text-slate-500 text-sm mb-8 leading-relaxed">
-                        Votre assistant pédagogique intelligent pour la <br className="hidden sm:block"/>
+                        Votre assistant pédagogique intelligent pour la <br className="hidden sm:block" />
                         <span className="font-semibold text-nws-purple">Normandie Web School</span>.
                     </p>
 
