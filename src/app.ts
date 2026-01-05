@@ -101,7 +101,7 @@ export default async function buildApp(): Promise<express.Express> {
   app.use(express.static(staticDir));
 
   // Routes
-  app.use("/MentorAI/api", createApiRouter({
+  app.use("/api", createApiRouter({
     openai,
     mentorSystemTemplate,
     summarySystemTemplate,
