@@ -61,7 +61,7 @@ export default async function buildApp(): Promise<express.Express> {
       maxAge: 1000 * 60 * 60 * 2, // 2h (cohérent avec le TTL)
       sameSite: 'lax'
     },
-    name: 'mentorai.sid' // Nom custom pour le cookie
+    name: 'mentorai.sid'
   }));
 
   // DB
@@ -101,7 +101,7 @@ export default async function buildApp(): Promise<express.Express> {
   app.use(express.static(staticDir));
 
   // Routes
-  app.use("/api", createApiRouter({
+  app.use("/MentorAI/api", createApiRouter({
     openai,
     mentorSystemTemplate,
     summarySystemTemplate,
@@ -109,7 +109,7 @@ export default async function buildApp(): Promise<express.Express> {
     programs
   }));
 
-  // Catch-all pour React Router (après les routes API)
+  // Catch-all
   app.get(/^\/(?!api).*/, (_req, res) => {
     res.sendFile(path.join(staticDir, "index.html"));
   });

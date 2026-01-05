@@ -2,7 +2,6 @@
 
 import React from "react";
 import StatusBadge from "./StatusBadge";
-import { GraduationCap } from "lucide-react"; // Import d'une icône de secours si pas de logo
 
 function Header({ online, count, limit }) {
     return (
