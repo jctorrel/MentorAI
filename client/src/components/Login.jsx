@@ -50,8 +50,9 @@ function Login() {
             setLoading(true);
             try {
                 const idToken = response.credential;
+                const API = `${import.meta.env.BASE_URL}api`;
 
-                const res = await apiFetch("/api/auth/google", {
+                const res = await fetch(`${API}/auth/google`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ idToken }),
