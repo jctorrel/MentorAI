@@ -1,6 +1,7 @@
 // src/components/Login.jsx
 import React, { useEffect, useState } from "react";
 import { GraduationCap, AlertCircle, Loader2 } from "lucide-react";
+import { apiFetch } from "../utils/apiFetch";
 
 function Login() {
     const [error, setError] = useState("");
@@ -50,7 +51,7 @@ function Login() {
             try {
                 const idToken = response.credential;
 
-                const res = await fetch("/api/auth/google", {
+                const res = await apiFetch("/api/auth/google", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ idToken }),
