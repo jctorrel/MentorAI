@@ -1,7 +1,6 @@
 // src/components/Login.jsx
 import React, { useEffect, useState } from "react";
 import { GraduationCap, AlertCircle, Loader2 } from "lucide-react";
-import { apiFetch } from "../utils/apiFetch";
 
 function Login() {
     const [error, setError] = useState("");
